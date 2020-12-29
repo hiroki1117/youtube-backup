@@ -39,13 +39,13 @@ resource "aws_security_group" "sg" {
 
 #Batch
 resource "aws_batch_compute_environment" "youtubedl_batch" {
-  compute_environment_name = "youtubedl-batch"
+  compute_environment_name = "youtubedl-batch2"
 
   compute_resources {
     type                = "SPOT"
     spot_iam_fleet_role = module.iam_assumable_role_for_ec2_spot_fleet.this_iam_role_arn
     bid_percentage      = var.spot_bid_percentage
-    subnets             = var.public_subnets
+    subnets             = module.vpc.public_subnets
     security_group_ids  = [aws_security_group.sg.id]
     instance_role       = aws_iam_instance_profile.ecs_instance_profile.arn
     instance_type       = var.instance_types
@@ -65,14 +65,21 @@ resource "aws_batch_compute_environment" "youtubedl_batch" {
     module.iam_assumable_role_for_aws_batch_service,
     module.iam_assumable_role_for_ecs_instance_role
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 // ジョブキューの用意
 resource "aws_batch_job_queue" "youtubedl_batch_queue" {
-  name                 = "youtubedl-batch-queue"
+  name                 = "youtubedl-batch-queue2"
   state                = "ENABLED"
   priority             = 1
   compute_environments = [aws_batch_compute_environment.youtubedl_batch.arn]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 #ECR
