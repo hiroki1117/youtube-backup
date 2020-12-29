@@ -75,6 +75,15 @@ resource "aws_batch_job_queue" "youtubedl_batch_queue" {
   compute_environments = [aws_batch_compute_environment.youtubedl_batch.arn]
 }
 
+#ECR
+resource "aws_ecr_repository" "youtubedl_registory" {
+  name                 = "youtube-downloader"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
 
 #AWS Batchサービスロール
 module "iam_assumable_role_for_aws_batch_service" {
