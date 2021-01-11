@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "hiroki1117-tf-state"
+    key    = "youtube-dl"
+    region = "ap-northeast-1"
+  }
+}
+
 provider "aws" {
   region = "ap-northeast-1"
 }
@@ -24,6 +32,7 @@ module "vpc" {
 #SG
 resource "aws_security_group" "sg" {
   name = "aws_batch_compute_environment_security_group"
+  vpc_id = module.vpc.vpc_id
 
   egress {
     from_port   = 0
@@ -39,7 +48,7 @@ resource "aws_security_group" "sg" {
 
 #Batch
 resource "aws_batch_compute_environment" "youtubedl_batch" {
-  compute_environment_name = "youtubedl-batch2"
+  compute_environment_name = "youtubedl-batch4"
 
   compute_resources {
     type                = "SPOT"
@@ -71,9 +80,9 @@ resource "aws_batch_compute_environment" "youtubedl_batch" {
   }
 }
 
-// ジョブキューの用意
+#ジョブキューの用意
 resource "aws_batch_job_queue" "youtubedl_batch_queue" {
-  name                 = "youtubedl-batch-queue2"
+  name                 = "youtubedl-batch-queue4"
   state                = "ENABLED"
   priority             = 1
   compute_environments = [aws_batch_compute_environment.youtubedl_batch.arn]
@@ -142,14 +151,13 @@ module "iam_assumable_role_for_ecs_instance_role" {
   role_requires_mfa = false
 
   custom_role_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
   ]
 }
 
 #インスタンスプロファイル
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "youtubedl_profile"
+  name = "youtubedl-profile"
   role = module.iam_assumable_role_for_ecs_instance_role.this_iam_role_name
 }
 

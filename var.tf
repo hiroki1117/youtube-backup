@@ -40,7 +40,7 @@ variable "spot_bid_percentage" {
 
 variable "instance_types" {
   type    = list(string)
-  default = ["m5"]
+  default = ["m5.large", "m5.xlarge"]
 }
 
 variable "instance_settings" {
