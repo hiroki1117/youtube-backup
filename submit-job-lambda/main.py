@@ -6,7 +6,7 @@ def lambda_handler(event, context):
     
     client = BatchClient()
     queue = "youtubedl-batch-queue4"
-    jobDefinition = "sample-youtube-dl:7"
+    jobDefinition = "sample-youtube-dl:10"
     jobname = "youtubedljob-from-lambda"
     containerOverrides={
         'environment': [
