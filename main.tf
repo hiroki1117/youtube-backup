@@ -91,6 +91,23 @@ resource "aws_batch_job_queue" "youtubedl_batch_queue" {
   }
 }
 
+#ジョブ定義
+resource "aws_batch_job_definition" "youtube_dl_job_definition" {
+  name = "youtube-dl-job-definition"
+  type = "container"
+  container_properties = templatefile("./batch_container_definitions.tpl",
+    {
+      job_role_arn = module.iam_assumable_role_for_youtubedl_batchjob.this_iam_role_arn,
+      log_group = var.youtube_dl_job_log_group_name
+    }
+  )
+}
+
+#ジョブのロググループ
+resource "aws_cloudwatch_log_group" "youtube_dl_job_log_group" {
+  name = var.youtube_dl_job_log_group_name
+}
+
 #ECR
 resource "aws_ecr_repository" "youtubedl_registory" {
   name                 = "youtube-downloader"
@@ -159,6 +176,24 @@ module "iam_assumable_role_for_ecs_instance_role" {
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
   name = "youtubedl-profile"
   role = module.iam_assumable_role_for_ecs_instance_role.this_iam_role_name
+}
+
+#ジョブ用のロール
+module "iam_assumable_role_for_youtubedl_batchjob" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  trusted_role_services = [
+    "ecs-tasks.amazonaws.com"
+  ]
+
+  create_role = true
+
+  role_name         = "YoutubeDLJobRole"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  ]
 }
 
 #S3

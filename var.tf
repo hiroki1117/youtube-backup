@@ -51,3 +51,8 @@ variable "instance_settings" {
     max_vcpus = 4
   }
 }
+
+variable "youtube_dl_job_log_group_name" {
+  type    = string
+  default = "/aws/batch/youtube-dl"
+}
