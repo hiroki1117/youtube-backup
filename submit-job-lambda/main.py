@@ -16,40 +16,20 @@ def lambda_handler(event, context):
 
     # DynamoDBに保存
     dynamo_client = DynamoClient()
-    dynamo_client.insert(video_data)
+    is_inserted = dynamo_client.insert(video_data)
 
     # AWS Batchで動画保存処理
-    client = BatchClient()
-    queue = "youtubedl-batch-queue4"
-    jobDefinition = "youtube-dl-job-definition:14"
-    jobname = "youtubedljob-from-lambda"
-    containerOverrides={
-        'environment': [
-            {
-                'name': 'URL',
-                'value': url
-            },
-            {
-                'name': 'FILENAME',
-                'value': video_data.backup_filename
-            },
-            {
-                'name': 'S3PATH',
-                'value': video_data.s3path
-            }
-        ]
-    }
-    
-    client.submit_job(
-        job_name=jobname,
-        job_queue=queue,
-        job_definition=jobDefinition,
-        container_overrides=containerOverrides
-        )
+    if is_inserted:
+        batch_client = BatchClient()    
+        batch_client.submit_job(url, video_data)
      
     response = {
         "statusCode": 200,
-        "body": str(video_data),
+        "body": json.dumps({
+            'video_id': video_data.id,
+            'title': video_data.title,
+            'already_backup': not is_inserted
+        }),
         "headers": {
             "Content-Type": "application/json"
         }
@@ -62,12 +42,32 @@ class BatchClient:
 
     def __init__(self):
         self.client = boto3.client("batch")
+        self.job_queue = "youtubedl-batch-queue4"
+        self.job_definition = "youtube-dl-job-definition:21"
+        self.jobname = "youtubedljob-from-lambda"
 
-    def submit_job(self, job_name: str, job_queue: str, job_definition: str, container_overrides: dict):
+    def submit_job(self, url, video_data):
+        container_overrides={
+            'environment': [
+                {
+                    'name': 'URL',
+                    'value': url
+                },
+                {
+                    'name': 'FILENAME',
+                    'value': video_data.backup_filename
+                },
+                {
+                    'name': 'S3PATH',
+                    'value': video_data.s3path
+                }
+            ]
+        }
+        
         self.client.submit_job(
-            jobName=job_name,
-            jobQueue=job_queue,
-            jobDefinition=job_definition,
+            jobName=self.jobname,
+            jobQueue=self.job_queue,
+            jobDefinition=self.job_definition,
             containerOverrides=container_overrides
         )
 
@@ -76,10 +76,14 @@ class DynamoClient():
 
     def __init__(self):
         self.dynamo_client = boto3.resource("dynamodb")
+        self.table = self.dynamo_client.Table('YoutubeBackup')
 
     def insert(self, youtubedata):
-        table = self.dynamo_client.Table('YoutubeBackup')
-        response = table.put_item(
+        # 既に保存されている場合はFalseを返してinsertしない
+        if self.__check_already_exists(youtubedata.id):
+            return False
+
+        response = self.table.put_item(
             Item = {
                 'video_id': youtubedata.id,
                 'title': youtubedata.title,
@@ -87,6 +91,14 @@ class DynamoClient():
                 's3fullpath': youtubedata.s3path + youtubedata.backup_filename
             }
         )
+
+        return True
+    
+    def __check_already_exists(self, video_id):
+        res = self.table.get_item(Key={'video_id': video_id})
+        return True if 'Item' in res else False
+
+
 
 
 class YoutubeClient():
