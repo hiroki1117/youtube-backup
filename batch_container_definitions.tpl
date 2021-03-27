@@ -10,10 +10,19 @@
       "awslogs-region": "ap-northeast-1",
       "awslogs-stream-prefix": "youtube-dl-job",
       "awslogs-group": "${log_group}"
-    }
+    },
+    "secretOptions": []
   },
   "memory": 512,
   "vcpus": 1,
   "command" : ["bash","main.sh"],
-  "type": "container"
+  "type": "container",
+  "environment": [],
+  "mountPoints": [],
+  "resourceRequirements": [],
+  "secrets": [],
+  "ulimits": [],
+  "volumes": [],
+  "parameters": [],
+  "tags": {}
 }

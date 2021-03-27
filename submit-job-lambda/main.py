@@ -43,7 +43,7 @@ class BatchClient:
     def __init__(self):
         self.client = boto3.client("batch")
         self.job_queue = "youtubedl-batch-queue4"
-        self.job_definition = "youtube-dl-job-definition:21"
+        self.job_definition = "youtube-dl-job-definition:23"
         self.jobname = "youtubedljob-from-lambda"
 
     def submit_job(self, url, video_data):
@@ -78,17 +78,19 @@ class DynamoClient():
         self.dynamo_client = boto3.resource("dynamodb")
         self.table = self.dynamo_client.Table('YoutubeBackup')
 
-    def insert(self, youtubedata):
+    def insert(self, videodata):
         # 既に保存されている場合はFalseを返してinsertしない
-        if self.__check_already_exists(youtubedata.id):
+        if self.__check_already_exists(videodata.id):
             return False
 
         response = self.table.put_item(
             Item = {
-                'video_id': youtubedata.id,
-                'title': youtubedata.title,
-                'backupdate': youtubedata.backupdate,
-                's3fullpath': youtubedata.s3path + youtubedata.backup_filename
+                'video_id': videodata.id,
+                'video_url': videodata.url,
+                'platform': videodata.platform,
+                'title': videodata.title,
+                'backupdate': videodata.backupdate,
+                's3fullpath': videodata.s3path + videodata.backup_filename
             }
         )
 
@@ -97,8 +99,6 @@ class DynamoClient():
     def __check_already_exists(self, video_id):
         res = self.table.get_item(Key={'video_id': video_id})
         return True if 'Item' in res else False
-
-
 
 
 class YoutubeClient():
@@ -110,6 +110,7 @@ class YoutubeClient():
             WithDecryption=True
             )
         self.YOUTUBE_API_KEY = ssm_response['Parameters'][0]['Value']
+        self.PLATFORM = 'youtube'
     
     def video_info(self, video_url):
         video_id = self.__parse_url(video_url)
@@ -121,12 +122,14 @@ class YoutubeClient():
             print(video_json)
 
         day = datetime.date.today()
-        return YoutubeData(
+        return VideoData(
             id=video_id,
+            url=url,
+            platform=self.PLATFORM,
             title=video_json['items'][0]['snippet']['title'],
-            s3path=f's3://youtubedl-bucket/{day.year}/{day.month}/{day.day}/',
+            s3path=f's3://youtubedl-bucket/{self.PLATFORM}/{day.year}/{day.month}/{day.day}/',
             backupdate=str(day),
-            backup_filename=video_json['items'][0]['snippet']['title'] + '-' + video_id + '.mp4'
+            backup_filename=video_id + '.mp4'
         )
     
     def __parse_url(self, url):
@@ -134,9 +137,11 @@ class YoutubeClient():
 
 
 @dataclasses.dataclass
-class YoutubeData():
+class VideoData():
     id: str
+    url: str
     title: str
+    platform: str
     s3path: str
     backup_filename: str
     backupdate: str
