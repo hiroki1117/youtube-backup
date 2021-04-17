@@ -104,7 +104,7 @@ class DynamoClient():
 class VideoController():
 
     def get_video_data(self, url):
-        if "youtube" in url:
+        if ("youtube" in url) | ("youtu.be" in url):
             youtube_client = YoutubeClient()
             video_data = youtube_client.video_info(url)
         elif "twitter" in url:
@@ -126,8 +126,10 @@ class YoutubeClient():
             )
         self.YOUTUBE_API_KEY = ssm_response['Parameters'][0]['Value']
         self.PLATFORM = 'youtube'
+        self.NORMAL_YOUTUBE_BASE_URL = 'https://www.youtube.com/watch?v='
     
     def video_info(self, video_url):
+        video_url = self._normalize_url(video_url)
         video_id = self.__parse_url(video_url)
         url = f'https://www.googleapis.com/youtube/v3/videos?id={video_id}&key={self.YOUTUBE_API_KEY}&part=snippet'
         
@@ -149,6 +151,10 @@ class YoutubeClient():
     
     def __parse_url(self, url):
         return parse_qs(urlparse(url).query)['v'][0]
+
+    # youtubeのリダイレクトurl対応
+    def _normalize_url(self, url):
+        return url if "youtube" in url else self.NORMAL_YOUTUBE_BASE_URL + urlparse(url).path[1::]
 
 
 class TwitterClient():
