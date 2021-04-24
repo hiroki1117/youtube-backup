@@ -31,7 +31,10 @@ def lambda_handler(event, context):
             'already_backup': not is_inserted
         }),
         "headers": {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Headers": 'Content-Type',
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": 'OPTIONS,POST,GET'
         }
     }
     return response
@@ -90,7 +93,8 @@ class DynamoClient():
                 'platform': videodata.platform,
                 'title': videodata.title,
                 'backupdate': videodata.backupdate,
-                's3fullpath': videodata.s3path + videodata.backup_filename
+                's3fullpath': videodata.s3path + videodata.backup_filename,
+                'upload_status': "init"
             }
         )
 

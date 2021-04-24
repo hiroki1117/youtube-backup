@@ -75,3 +75,41 @@ module "iam_assumable_role_for_deletevideo_lambda" {
     "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   ]
 }
+
+#動画アップロード完了処理をするLambda
+resource "aws_lambda_function" "video_upload_lambda" {
+  filename      = data.archive_file.video_upload.output_path
+  function_name = "video-upload-complete-lambda"
+  role          = module.iam_assumable_role_for_video_upload_lambda.this_iam_role_arn
+  handler       = "main.lambda_handler"
+  source_code_hash = data.archive_file.video_upload.output_base64sha256
+
+  runtime = "python3.8"
+
+}
+
+data "archive_file" "video_upload" {
+  type        = "zip"
+  source_dir  = "./complete-video-upload"
+  output_path = "complete-video-upload.zip"
+}
+
+#Lambdaのロール
+module "iam_assumable_role_for_video_upload_lambda" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  trusted_role_services = [
+    "lambda.amazonaws.com"
+  ]
+
+  create_role = true
+
+  role_name         = "VideoUploadCompleteLambdaRole"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+  ]
+}
