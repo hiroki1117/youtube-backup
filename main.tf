@@ -1,4 +1,5 @@
 terraform {
+  required_version = "~> 0.14"
   backend "s3" {
     bucket = "hiroki1117-tf-state"
     key    = "youtube-dl"
