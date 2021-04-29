@@ -17,6 +17,7 @@ def lambda_handler(event, context):
     # DynamoDBに保存
     dynamo_client = DynamoClient()
     is_inserted = dynamo_client.insert(video_data)
+    s3path = dynamo_client.get_video_s3path(video_data)
 
     # AWS Batchで動画保存処理
     batch_job_id = ""
@@ -30,7 +31,8 @@ def lambda_handler(event, context):
             'video_id': video_data.id,
             'title': video_data.title,
             'already_backup': not is_inserted,
-            'batch_job_id': batch_job_id
+            'batch_job_id': batch_job_id,
+            's3': s3path
         }),
         "headers": {
             "Content-Type": "application/json",
@@ -102,6 +104,10 @@ class DynamoClient():
 
         return True
     
+    def get_video_s3path(self, videodata):
+        res = self.table.get_item(Key={'video_id': videodata.id})
+        return res['Item']['s3fullpath'] if 'Item' in res else videodata.s3path
+
     def __check_already_exists(self, video_id):
         res = self.table.get_item(Key={'video_id': video_id})
         return True if 'Item' in res else False
