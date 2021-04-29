@@ -19,16 +19,18 @@ def lambda_handler(event, context):
     is_inserted = dynamo_client.insert(video_data)
 
     # AWS Batchで動画保存処理
+    batch_job_id = ""
     if is_inserted:
         batch_client = BatchClient()    
-        batch_client.submit_job(url, video_data)
+        batch_job_id = batch_client.submit_job(url, video_data)["jobId"]
      
     response = {
         "statusCode": 200,
         "body": json.dumps({
             'video_id': video_data.id,
             'title': video_data.title,
-            'already_backup': not is_inserted
+            'already_backup': not is_inserted,
+            'batch_job_id': batch_job_id
         }),
         "headers": {
             "Content-Type": "application/json",
@@ -67,7 +69,7 @@ class BatchClient:
             ]
         }
         
-        self.client.submit_job(
+        return self.client.submit_job(
             jobName=self.jobname,
             jobQueue=self.job_queue,
             jobDefinition=self.job_definition,
