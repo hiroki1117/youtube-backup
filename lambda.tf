@@ -2,7 +2,7 @@
 resource "aws_lambda_function" "submitjob_lambda" {
   filename      = data.archive_file.submitjob_batch.output_path
   function_name = "submitjob-lambda"
-  role          = module.iam_assumable_role_for_submitjob_lambda.this_iam_role_arn
+  role          = module.iam_assumable_role_for_submitjob_lambda.iam_role_arn
   handler       = "main.lambda_handler"
   source_code_hash = data.archive_file.submitjob_batch.output_base64sha256
 
@@ -42,7 +42,7 @@ module "iam_assumable_role_for_submitjob_lambda" {
 resource "aws_lambda_function" "delete_video_lambda" {
   filename      = data.archive_file.delete_video.output_path
   function_name = "delete-video-lambda"
-  role          = module.iam_assumable_role_for_deletevideo_lambda.this_iam_role_arn
+  role          = module.iam_assumable_role_for_deletevideo_lambda.iam_role_arn
   handler       = "main.lambda_handler"
   source_code_hash = data.archive_file.delete_video.output_base64sha256
 
@@ -80,7 +80,7 @@ module "iam_assumable_role_for_deletevideo_lambda" {
 resource "aws_lambda_function" "video_upload_lambda" {
   filename      = data.archive_file.video_upload.output_path
   function_name = "video-upload-complete-lambda"
-  role          = module.iam_assumable_role_for_video_upload_lambda.this_iam_role_arn
+  role          = module.iam_assumable_role_for_video_upload_lambda.iam_role_arn
   handler       = "main.lambda_handler"
   source_code_hash = data.archive_file.video_upload.output_base64sha256
 

@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 0.14"
+  required_version = "~> 0.15"
   backend "s3" {
     bucket = "hiroki1117-tf-state"
     key    = "youtube-dl"
@@ -53,7 +53,7 @@ resource "aws_batch_compute_environment" "youtubedl_batch" {
 
   compute_resources {
     type                = "SPOT"
-    spot_iam_fleet_role = module.iam_assumable_role_for_ec2_spot_fleet.this_iam_role_arn
+    spot_iam_fleet_role = module.iam_assumable_role_for_ec2_spot_fleet.iam_role_arn
     bid_percentage      = var.spot_bid_percentage
     subnets             = module.vpc.public_subnets
     security_group_ids  = [aws_security_group.sg.id]
@@ -67,7 +67,7 @@ resource "aws_batch_compute_environment" "youtubedl_batch" {
     }
   }
 
-  service_role = module.iam_assumable_role_for_aws_batch_service.this_iam_role_arn
+  service_role = module.iam_assumable_role_for_aws_batch_service.iam_role_arn
   state        = "ENABLED"
   type         = "MANAGED"
   depends_on = [
@@ -98,7 +98,7 @@ resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   type = "container"
   container_properties = templatefile("./batch_container_definitions.tpl",
     {
-      job_role_arn = module.iam_assumable_role_for_youtubedl_batchjob.this_iam_role_arn,
+      job_role_arn = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
       log_group = var.youtube_dl_job_log_group_name
     }
   )
@@ -176,7 +176,7 @@ module "iam_assumable_role_for_ecs_instance_role" {
 #インスタンスプロファイル
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
   name = "youtubedl-profile"
-  role = module.iam_assumable_role_for_ecs_instance_role.this_iam_role_name
+  role = module.iam_assumable_role_for_ecs_instance_role.iam_role_name
 }
 
 #ジョブ用のロール
