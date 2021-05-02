@@ -61,6 +61,9 @@ resource "aws_batch_compute_environment" "youtubedl_batch" {
     instance_type       = var.instance_types
     min_vcpus           = var.instance_settings["min_vcpus"]
     max_vcpus           = var.instance_settings["max_vcpus"]
+    launch_template {
+      launch_template_id = aws_launch_template.ecs_instance_template.id
+    }
 
     tags = {
       Product = "youtube-dl"
@@ -78,6 +81,17 @@ resource "aws_batch_compute_environment" "youtubedl_batch" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+resource "aws_launch_template" "ecs_instance_template" {
+  name = "ECSForEBSTemplate"
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 50
+    }
   }
 }
 
