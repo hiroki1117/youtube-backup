@@ -49,7 +49,7 @@ resource "aws_security_group" "sg" {
 
 #Batch
 resource "aws_batch_compute_environment" "youtubedl_batch" {
-  compute_environment_name = "youtubedl-batch4"
+  compute_environment_name = "youtubedl-batch"
 
   compute_resources {
     type                = "SPOT"
@@ -97,7 +97,7 @@ resource "aws_launch_template" "ecs_instance_template" {
 
 #ジョブキューの用意
 resource "aws_batch_job_queue" "youtubedl_batch_queue" {
-  name                 = "youtubedl-batch-queue4"
+  name                 = var.youtube_dl_job_queue_name
   state                = "ENABLED"
   priority             = 1
   compute_environments = [aws_batch_compute_environment.youtubedl_batch.arn]
@@ -108,7 +108,7 @@ resource "aws_batch_job_queue" "youtubedl_batch_queue" {
 
 #ジョブ定義
 resource "aws_batch_job_definition" "youtube_dl_job_definition" {
-  name = "youtube-dl-job-definition"
+  name = var.youtube_dl_job_definition_name
   type = "container"
   container_properties = templatefile("./batch_container_definitions.tpl",
     {

@@ -1,3 +1,4 @@
+import os
 import boto3
 import json
 import dataclasses
@@ -49,8 +50,8 @@ class BatchClient:
 
     def __init__(self):
         self.client = boto3.client("batch")
-        self.job_queue = "youtubedl-batch-queue4"
-        self.job_definition = "youtube-dl-job-definition:23"
+        self.job_queue = os.environ["JOB_QUEUE_NAME"]
+        self.job_definition = os.environ["JOB_DEFINITION_NAME"] + ":" + os.environ["JOB_REVISION"]
         self.jobname = "youtubedljob-from-lambda"
 
     def submit_job(self, url, video_data):

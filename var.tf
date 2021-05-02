@@ -41,6 +41,7 @@ variable "spot_bid_percentage" {
 variable "instance_types" {
   type    = list(string)
   default = ["m5.large", "m5.xlarge"]
+  # default = ["m5.2xlarge"]
 }
 
 variable "instance_settings" {
@@ -48,11 +49,21 @@ variable "instance_settings" {
 
   default = {
     min_vcpus = 0
-    max_vcpus = 4
+    max_vcpus = 10
   }
 }
 
 variable "youtube_dl_job_log_group_name" {
   type    = string
   default = "/aws/batch/youtube-dl"
+}
+
+variable "youtube_dl_job_definition_name" {
+  type = string
+  default = "youtube-dl-job-definition"  
+}
+
+variable "youtube_dl_job_queue_name" {
+  type = string
+  default = "youtubedl-batch-queue"
 }

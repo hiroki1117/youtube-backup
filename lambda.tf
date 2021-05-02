@@ -8,6 +8,14 @@ resource "aws_lambda_function" "submitjob_lambda" {
 
   runtime = "python3.8"
 
+  environment {
+    variables = {
+      JOB_DEFINITION_NAME = var.youtube_dl_job_definition_name
+      JOB_REVISION = aws_batch_job_definition.youtube_dl_job_definition.revision
+      JOB_QUEUE_NAME = var.youtube_dl_job_queue_name
+    }
+  }
+
 }
 
 data "archive_file" "submitjob_batch" {
