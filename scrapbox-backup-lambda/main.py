@@ -2,6 +2,7 @@ import re
 import json
 import boto3
 import urllib.request
+from urllib.parse import quote
 
 def lambda_handler(event, context):
     
@@ -15,15 +16,25 @@ def lambda_handler(event, context):
     # hoge,fuga,...形式
     SCRAPBOX_PROJECTS = ssm_response['Parameters'][2]['Value']
 
-    LIMIT = 10
+    LIMIT = "10"
     base_endpoint = "https://scrapbox.io/api/pages/"
     header = {
         "Cookie": "connect.sid="+SCRAPBOX_CREDENTIALS
     }
+    result_youtube_urls = []
 
     for project in SCRAPBOX_PROJECTS.split(","):
-        pagetitles = get_pagetitle(base_endpoint + projects, header)
-        [for i in pagetitles]
+        all_content = [line for title in get_pagetitle(base_endpoint + project + "?limit=" + LIMIT, header) for line in get_page_content(base_endpoint+project+"/"+quote(title, safe=""), header)]
+        tmp_ids = filter(lambda y: y is not None ,map(lambda x: extract_youtubevideoid(x), all_content))
+        result_youtube_urls += tmp_ids
+    
+    for youtube_url in result_youtube_urls:
+        youtube_backup_request(YOUTUBE_BACKUP_ENDPOINT, youtube_url)
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from ScrapboxBackup')
+    }
 
 
 # ページのタイトルの配列を返却
@@ -56,8 +67,7 @@ def extract_youtubevideoid(text):
 	return None
 
 # youtube backupリクエスト
-def youtube_backup_request(url, video_id):
-    youtube_url = "https://www.youtube.com/watch?v=" + video_id
+def youtube_backup_request(url, youtube_url):
     req = urllib.request.Request(url + youtube_url)
     with urllib.request.urlopen(req) as res:
         o = json.load(res)

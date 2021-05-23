@@ -121,3 +121,41 @@ module "iam_assumable_role_for_video_upload_lambda" {
     "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
   ]
 }
+
+
+#Scrapboxバックアップ処理をするLambda
+resource "aws_lambda_function" "scrapbox_backup_lambda" {
+  filename      = data.archive_file.scrapbox_backup.output_path
+  function_name = "scrapbox-backup-lambda"
+  role          = module.iam_assumable_role_for_scrapbox_backup_lambda.iam_role_arn
+  handler       = "main.lambda_handler"
+  source_code_hash = data.archive_file.scrapbox_backup.output_base64sha256
+  timeout = 500
+
+  runtime = "python3.8"
+}
+
+data "archive_file" "scrapbox_backup" {
+  type        = "zip"
+  source_dir  = "./scrapbox-backup-lambda"
+  output_path = "scrapbox-backup-lambda.zip"
+}
+
+#Lambdaのロール
+module "iam_assumable_role_for_scrapbox_backup_lambda" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  trusted_role_services = [
+    "lambda.amazonaws.com"
+  ]
+
+  create_role = true
+
+  role_name         = "ScrapboxBackupLambdaRole"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+  ]
+}

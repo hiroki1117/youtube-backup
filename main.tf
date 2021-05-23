@@ -121,6 +121,7 @@ resource "aws_batch_job_definition" "youtube_dl_job_definition" {
 #ジョブのロググループ
 resource "aws_cloudwatch_log_group" "youtube_dl_job_log_group" {
   name = var.youtube_dl_job_log_group_name
+  retention_in_days = 7
 }
 
 #ECR
@@ -239,4 +240,25 @@ resource "aws_s3_bucket_notification" "youtubedl_bucket_notification" {
   }
 
   depends_on = [aws_lambda_permission.allow_bucket]
+}
+
+#ScrapboxBackupLambdaの定期実行
+resource "aws_cloudwatch_event_rule" "scrapbox_backup_rule" {
+  name                = "ScrapboxBackupRule"
+  description         = "hourly"
+  schedule_expression = "cron(0 * * * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "scrapbox_backup_target" {
+  target_id = "ScrapboxBackup"
+  arn       = aws_lambda_function.scrapbox_backup_lambda.arn
+  rule      = aws_cloudwatch_event_rule.scrapbox_backup_rule.name
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.scrapbox_backup_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.scrapbox_backup_rule.arn
 }
