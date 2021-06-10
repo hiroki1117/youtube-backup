@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 
 echo $URL
 echo $FILENAME
