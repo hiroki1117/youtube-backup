@@ -1,7 +1,7 @@
 
 {
   "jobDefinitionName": "youtube-dl-job-definition",
-  "image": "103933412310.dkr.ecr.ap-northeast-1.amazonaws.com/youtube-downloader:v3",
+  "image": "103933412310.dkr.ecr.ap-northeast-1.amazonaws.com/youtube-downloader:v4",
   "executionRoleArn": "arn:aws:iam::103933412310:role/ecsTaskExecutionRole",
   "jobRoleArn": "${job_role_arn}",
   "logConfiguration": {

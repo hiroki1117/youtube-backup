@@ -21,7 +21,7 @@ variable "public_subnets" {
   type = list(string)
 
   default = [
-    "192.168.1.0/24"
+    "192.168.2.0/24"
   ]
 }
 
@@ -29,7 +29,7 @@ variable "private_subnets" {
   type = list(string)
 
   default = [
-    "192.168.101.0/24"
+    "192.168.102.0/24"
   ]
 }
 
