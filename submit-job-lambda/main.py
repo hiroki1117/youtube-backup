@@ -84,7 +84,7 @@ class DynamoClient():
 
     def __init__(self):
         self.dynamo_client = boto3.resource("dynamodb")
-        self.table = self.dynamo_client.Table('YoutubeBackup')
+        self.table = self.dynamo_client.Table(os.environ["DYNAMO_TABLE_NAME"])
 
     def insert(self, videodata):
         # 既に保存されている場合はFalseを返してinsertしない

@@ -9,7 +9,7 @@ def lambda_handler(event, context):
 
 def update_video_upload_status(video_id):
     dynamo_client = boto3.resource("dynamodb")
-    table = dynamo_client.Table('YoutubeBackup')
+    table = dynamo_client.Table(os.environ["DYNAMO_TABLE_NAME"])
     response = table.update_item(
         Key={
             'video_id': video_id

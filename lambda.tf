@@ -13,6 +13,7 @@ resource "aws_lambda_function" "submitjob_lambda" {
       JOB_DEFINITION_NAME = var.youtube_dl_job_definition_name
       JOB_REVISION = aws_batch_job_definition.youtube_dl_job_definition.revision
       JOB_QUEUE_NAME = var.youtube_dl_job_queue_name
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
     }
   }
 
@@ -56,6 +57,12 @@ resource "aws_lambda_function" "delete_video_lambda" {
 
   runtime = "python3.8"
 
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
+    }
+  }
+
 }
 
 data "archive_file" "delete_video" {
@@ -93,6 +100,12 @@ resource "aws_lambda_function" "video_upload_lambda" {
   source_code_hash = data.archive_file.video_upload.output_base64sha256
 
   runtime = "python3.8"
+
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
+    }
+  }
 
 }
 

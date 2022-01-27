@@ -1,3 +1,4 @@
+import os
 import boto3
 import json
 from urllib.parse import urlparse
@@ -64,7 +65,7 @@ class DynamoClient():
 
     def __init__(self):
         self.dynamo_client = boto3.resource("dynamodb")
-        self.table = self.dynamo_client.Table('YoutubeBackup')
+        self.table = self.dynamo_client.Table(os.environ["DYNAMO_TABLE_NAME"])
 
     def get_videodata(self, video_id):
         res = self.table.get_item(Key={'video_id': video_id})
