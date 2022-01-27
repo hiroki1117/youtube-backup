@@ -113,10 +113,21 @@ resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   container_properties = templatefile("./batch_container_definitions.tpl",
     {
       job_role_arn = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
-      log_group = var.youtube_dl_job_log_group_name
+      log_group = var.youtube_dl_job_log_group_name,
+      ecs_task_ex_role = data.aws_iam_role.ecsTaskExecutionRole.arn,
+      ecr_name = data.aws_ecr_repository.youtube_downloader_image.repository_url
     }
   )
 }
+
+data "aws_iam_role" "ecsTaskExecutionRole" {
+  name = "ecsTaskExecutionRole"
+}
+
+data "aws_ecr_repository" "youtube_downloader_image" {
+  name = "youtube-downloader"
+}
+
 
 #ジョブのロググループ
 resource "aws_cloudwatch_log_group" "youtube_dl_job_log_group" {
