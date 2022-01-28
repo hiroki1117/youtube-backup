@@ -6,16 +6,11 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   }
 
   body = templatefile("./apidefinition.json", {
-    sample_lambda_arn = aws_lambda_function.video_info_lambda.invoke_arn
+      submit-job-lambda_arn = aws_lambda_function.submitjob_lambda.invoke_arn
+      video-info-lambda_arn = aws_lambda_function.video_info_lambda.invoke_arn
+      delete-video-lambda_arn = aws_lambda_function.delete_video_lambda.invoke_arn
+      video-list-lambda_arn = aws_lambda_function.video_list_lambda.invoke_arn
   })
-}
-
-resource "aws_lambda_permission" "apigw_lambda" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.video_info_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/*/*"
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
@@ -32,6 +27,7 @@ resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [aws_api_gateway_rest_api.rest_api]
 }
 
+# API Gatewayとカスタムドメインの対応付け
 resource "aws_api_gateway_base_path_mapping" "domain_mapping" {
   api_id      = aws_api_gateway_rest_api.rest_api.id
   stage_name  = var.api_gateway_stagename
@@ -59,4 +55,24 @@ data "aws_api_gateway_domain_name" "custome_domain" {
 # ドメインの取得はマネコンから行う
 data "aws_route53_zone" "hostzone" {
   name = var.hostzone
+}
+
+# API Gatewayがlambdaを呼び出す権限
+locals {
+    api_lambda_list = [
+        aws_lambda_function.submitjob_lambda.function_name,
+        aws_lambda_function.video_info_lambda.function_name,
+        aws_lambda_function.delete_video_lambda.function_name,
+        aws_lambda_function.video_list_lambda.function_name
+    ]
+}
+
+resource "aws_lambda_permission" "apigw_lambda_permission" {
+  count = length(local.api_lambda_list)
+
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = local.api_lambda_list[count.index]
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/*/*"
 }
