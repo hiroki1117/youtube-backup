@@ -173,6 +173,30 @@ module "iam_assumable_role_for_scrapbox_backup_lambda" {
   ]
 }
 
+#video_idから動画情報を取得するlambda
+resource "aws_lambda_function" "video_info_lambda" {
+  filename         = data.archive_file.video_info.output_path
+  function_name    = "video-info-lambda"
+  role             = module.iam_assumable_role_for_video_upload_lambda.iam_role_arn
+  handler          = "main.lambda_handler"
+  source_code_hash = data.archive_file.video_info.output_base64sha256
+
+  runtime = "python3.8"
+
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
+    }
+  }
+}
+
+data "archive_file" "video_info" {
+  type        = "zip"
+  source_dir  = "./video-info-lambda"
+  output_path = "video-info-lambda.zip"
+}
+
+
 #動画の一覧情報を取得するlambda
 resource "aws_lambda_function" "video_list_lambda" {
   filename         = data.archive_file.video_list.output_path
