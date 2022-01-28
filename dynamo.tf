@@ -26,4 +26,8 @@ resource "aws_dynamodb_table" "youtube-backup-table" {
     read_capacity   = 0
     write_capacity  = 0
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

@@ -237,6 +237,9 @@ resource "aws_s3_bucket" "youtubedl_bucket" {
   tags = {
     Product = "youtube-dl"
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 #S3のイベントでLambda起動を許可する
