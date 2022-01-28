@@ -31,3 +31,33 @@ resource "aws_dynamodb_table" "youtube-backup-table" {
     prevent_destroy = true
   }
 }
+
+
+resource "aws_backup_plan" "plan" {
+  name = "YoutubeBackupDynamoDBBackupPlan"
+  rule {
+    rule_name         = "YoutubeBackupRule"
+    target_vault_name = aws_backup_vault.vault.name
+    schedule          = "cron(0 12 * * ? *)"
+    lifecycle {
+      delete_after = 35
+    }
+  }
+}
+
+resource "aws_backup_vault" "vault" {
+  name = "YoutubeBackupVault"
+}
+
+resource "aws_backup_selection" "selection" {
+  iam_role_arn = data.aws_iam_role.BackupRole.arn
+  name         = "YoutubeBackupSelection"
+  plan_id      = aws_backup_plan.plan.id
+  resources = [
+    aws_dynamodb_table.youtube-backup-table.arn
+  ]
+}
+
+data "aws_iam_role" "BackupRole" {
+  name = "AWSBackupDefaultServiceRole"
+}
