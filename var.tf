@@ -45,7 +45,7 @@ variable "instance_types" {
 }
 
 variable "instance_settings" {
-  type = map
+  type = map(any)
 
   default = {
     min_vcpus = 0
@@ -59,11 +59,11 @@ variable "youtube_dl_job_log_group_name" {
 }
 
 variable "youtube_dl_job_definition_name" {
-  type = string
-  default = "youtube-dl-job-definition"  
+  type    = string
+  default = "youtube-dl-job-definition"
 }
 
 variable "youtube_dl_job_queue_name" {
-  type = string
+  type    = string
   default = "youtubedl-batch-queue"
 }
