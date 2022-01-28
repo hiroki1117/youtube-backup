@@ -219,3 +219,63 @@ data "archive_file" "video_list" {
   source_dir  = "./video-list-lambda"
   output_path = "video-list-lambda.zip"
 }
+
+# S3urlにpresignedするlambda
+resource "aws_lambda_function" "presigned_s3url_lambda" {
+  filename         = data.archive_file.presigned_s3url.output_path
+  function_name    = "presigned-s3url-lambda"
+  role             = module.iam_assumable_role_for_presigned_s3url_lambda.iam_role_arn
+  handler          = "main.lambda_handler"
+  source_code_hash = data.archive_file.presigned_s3url.output_base64sha256
+
+  runtime = "python3.8"
+
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
+    }
+  }
+}
+
+data "archive_file" "presigned_s3url" {
+  type        = "zip"
+  source_dir  = "./presigned-s3url-lambda"
+  output_path = "presigned-s3url-lambda.zip"
+}
+
+resource "aws_iam_policy" "youtubebackupbacket_readonly_policy" {
+  name = "youtubebackupbacket_readonly_policy_for_presigned"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject"
+        ]
+        Effect = "Allow"
+        Resource = "${aws_s3_bucket.youtubedl_bucket.arn}/*"
+      }
+    ]
+  })
+}
+
+#Lambdaのロール
+module "iam_assumable_role_for_presigned_s3url_lambda" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  trusted_role_services = [
+    "lambda.amazonaws.com"
+  ]
+
+  create_role = true
+
+  role_name         = "PresignedS3URLForYoutubeBackupLambdaRole"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+    aws_iam_policy.youtubebackupbacket_readonly_policy.arn
+  ]
+}

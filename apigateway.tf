@@ -10,6 +10,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
       video-info-lambda_arn = aws_lambda_function.video_info_lambda.invoke_arn
       delete-video-lambda_arn = aws_lambda_function.delete_video_lambda.invoke_arn
       video-list-lambda_arn = aws_lambda_function.video_list_lambda.invoke_arn
+      presigned-s3url-lambda_arn = aws_lambda_function.presigned_s3url_lambda.invoke_arn
   })
 }
 
@@ -63,7 +64,8 @@ locals {
         aws_lambda_function.submitjob_lambda.function_name,
         aws_lambda_function.video_info_lambda.function_name,
         aws_lambda_function.delete_video_lambda.function_name,
-        aws_lambda_function.video_list_lambda.function_name
+        aws_lambda_function.video_list_lambda.function_name,
+        aws_lambda_function.presigned_s3url_lambda.function_name
     ]
 }
 

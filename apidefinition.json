@@ -101,6 +101,31 @@
             "contentHandling" : "CONVERT_TO_TEXT"
           }
         }
+      },
+      "/presigned-s3url" : {
+        "get" : {
+          "produces" : [ "application/json" ],
+          "responses" : {
+            "200" : {
+              "description" : "200 response",
+              "schema" : {
+                "$ref" : "#/definitions/Empty"
+              }
+            }
+          },
+          "x-amazon-apigateway-integration" : {
+            "type" : "aws_proxy",
+            "httpMethod" : "POST",
+            "uri" : "${presigned-s3url-lambda_arn}",
+            "responses" : {
+              "default" : {
+                "statusCode" : "200"
+              }
+            },
+            "passthroughBehavior" : "when_no_match",
+            "contentHandling" : "CONVERT_TO_TEXT"
+          }
+        }
       }
     },
     "definitions" : {
