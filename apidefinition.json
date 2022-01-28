@@ -1,0 +1,37 @@
+{
+    "swagger" : "2.0",
+    "schemes" : [ "https" ],
+    "paths" : {
+      "/video" : {
+        "get" : {
+          "produces" : [ "application/json" ],
+          "responses" : {
+            "200" : {
+              "description" : "200 response",
+              "schema" : {
+                "$ref" : "#/definitions/Empty"
+              }
+            }
+          },
+          "x-amazon-apigateway-integration" : {
+            "type" : "aws_proxy",
+            "httpMethod" : "POST",
+            "uri" : "${sample_lambda_arn}",
+            "responses" : {
+              "default" : {
+                "statusCode" : "200"
+              }
+            },
+            "passthroughBehavior" : "when_no_match",
+            "contentHandling" : "CONVERT_TO_TEXT"
+          }
+        }
+      }
+    },
+    "definitions" : {
+      "Empty" : {
+        "type" : "object",
+        "title" : "Empty Schema"
+      }
+    }
+}

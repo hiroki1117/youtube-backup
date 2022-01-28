@@ -1,3 +1,6 @@
+variable "custome_domain_name" {}
+variable "hostzone" {}
+
 variable "vpc_name" {
   type        = string
   default     = "youtube-dl-vpc"
@@ -66,4 +69,9 @@ variable "youtube_dl_job_definition_name" {
 variable "youtube_dl_job_queue_name" {
   type    = string
   default = "youtubedl-batch-queue"
+}
+
+variable "api_gateway_stagename" {
+  type    = string
+  default = "prod"
 }
