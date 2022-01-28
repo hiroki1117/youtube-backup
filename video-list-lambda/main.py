@@ -5,8 +5,12 @@ from boto3.dynamodb.conditions import Attr
 import json
 
 def lambda_handler(event, context):
-    upload_status = event['queryStringParameters']['upload_status'] if "upload_status" in event['queryStringParameters'] else "complete"
-    fetch_num = event['queryStringParameters']['fetch_num'] if "fetch_num" in event['queryStringParameters'] else 30
+    if event['queryStringParameters'] is None:
+        upload_status = "complete"
+        fetch_num = 30
+    else:
+        upload_status = event['queryStringParameters']['upload_status'] if "upload_status" in event['queryStringParameters'] else "complete"
+        fetch_num = event['queryStringParameters']['fetch_num'] if "fetch_num" in event['queryStringParameters'] else 30
 
     # 最新のアップロードをn件取得
     table = boto3.resource("dynamodb").Table(os.environ["DYNAMO_TABLE_NAME"])
