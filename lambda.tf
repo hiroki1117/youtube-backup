@@ -253,7 +253,7 @@ resource "aws_iam_policy" "youtubebackupbacket_readonly_policy" {
         Action = [
           "s3:GetObject"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "${aws_s3_bucket.youtubedl_bucket.arn}/*"
       }
     ]

@@ -6,11 +6,11 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   }
 
   body = templatefile("./apidefinition.json", {
-      submit-job-lambda_arn = aws_lambda_function.submitjob_lambda.invoke_arn
-      video-info-lambda_arn = aws_lambda_function.video_info_lambda.invoke_arn
-      delete-video-lambda_arn = aws_lambda_function.delete_video_lambda.invoke_arn
-      video-list-lambda_arn = aws_lambda_function.video_list_lambda.invoke_arn
-      presigned-s3url-lambda_arn = aws_lambda_function.presigned_s3url_lambda.invoke_arn
+    submit-job-lambda_arn      = aws_lambda_function.submitjob_lambda.invoke_arn
+    video-info-lambda_arn      = aws_lambda_function.video_info_lambda.invoke_arn
+    delete-video-lambda_arn    = aws_lambda_function.delete_video_lambda.invoke_arn
+    video-list-lambda_arn      = aws_lambda_function.video_list_lambda.invoke_arn
+    presigned-s3url-lambda_arn = aws_lambda_function.presigned_s3url_lambda.invoke_arn
   })
 }
 
@@ -60,13 +60,13 @@ data "aws_route53_zone" "hostzone" {
 
 # API Gatewayがlambdaを呼び出す権限
 locals {
-    api_lambda_list = [
-        aws_lambda_function.submitjob_lambda.function_name,
-        aws_lambda_function.video_info_lambda.function_name,
-        aws_lambda_function.delete_video_lambda.function_name,
-        aws_lambda_function.video_list_lambda.function_name,
-        aws_lambda_function.presigned_s3url_lambda.function_name
-    ]
+  api_lambda_list = [
+    aws_lambda_function.submitjob_lambda.function_name,
+    aws_lambda_function.video_info_lambda.function_name,
+    aws_lambda_function.delete_video_lambda.function_name,
+    aws_lambda_function.video_list_lambda.function_name,
+    aws_lambda_function.presigned_s3url_lambda.function_name
+  ]
 }
 
 resource "aws_lambda_permission" "apigw_lambda_permission" {
