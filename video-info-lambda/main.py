@@ -7,7 +7,8 @@ def lambda_handler(event, context):
 
     # 動画情報の取得
     table = boto3.resource("dynamodb").Table(os.environ["DYNAMO_TABLE_NAME"])
-    video_data = table.get_item(Key={'video_id': video_id})
+    maybeitem = table.get_item(Key={'video_id': video_id})
+    video_data = maybeitem["Item"] if "Item" in maybeitem else None
     result = {
             'result': 'succ',
             'description': '',
