@@ -146,6 +146,11 @@ resource "aws_lambda_function" "scrapbox_backup_lambda" {
   timeout          = 500
 
   runtime = "python3.8"
+  environment {
+    variables = {
+      SUBMIT_JOB_ENDPOINT = "https://${data.aws_api_gateway_domain_name.custome_domain.id}/videobackup-submit?url="
+    }
+  }
 }
 
 data "archive_file" "scrapbox_backup" {

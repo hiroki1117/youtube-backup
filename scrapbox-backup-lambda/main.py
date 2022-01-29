@@ -1,3 +1,4 @@
+import os
 import re
 import json
 import boto3
@@ -8,13 +9,13 @@ def lambda_handler(event, context):
     
     ssm = boto3.client('ssm', region_name='ap-northeast-1')
     ssm_response = ssm.get_parameters(
-        Names = [('/youtube-backup/endpoint-url'), ('/youtube-backup/scrapbox-credentials'), ('/youtube-backup/scrapbox-projects')],
+        Names = [('/youtube-backup/scrapbox-credentials'), ('/youtube-backup/scrapbox-projects')],
         WithDecryption=True
     )
-    YOUTUBE_BACKUP_ENDPOINT = ssm_response['Parameters'][0]['Value']
-    SCRAPBOX_CREDENTIALS = ssm_response['Parameters'][1]['Value']
+    YOUTUBE_BACKUP_ENDPOINT = os.environ["SUBMIT_JOB_ENDPOINT"]
+    SCRAPBOX_CREDENTIALS = ssm_response['Parameters'][0]['Value']
     # hoge,fuga,...形式
-    SCRAPBOX_PROJECTS = ssm_response['Parameters'][2]['Value']
+    SCRAPBOX_PROJECTS = ssm_response['Parameters'][1]['Value']
 
     LIMIT = "10"
     base_endpoint = "https://scrapbox.io/api/pages/"

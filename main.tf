@@ -148,14 +148,14 @@ resource "aws_ecr_lifecycle_policy" "for_youtubedl" {
       rules = [
         {
           rulePriority = 5
-          description = "直近10イメージを保存"
+          description  = "直近10イメージを保存"
           action = {
             type = "expire"
           }
           selection = {
             countNumber = 10
-            countType = "imageCountMoreThan"
-            tagStatus = "any"
+            countType   = "imageCountMoreThan"
+            tagStatus   = "any"
           }
         }
       ]
