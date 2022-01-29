@@ -1,7 +1,7 @@
 
 {
   "jobDefinitionName": "youtube-dl-job-definition",
-  "image": "${ecr_name}:v4",
+  "image": "${ecr_name}:latest",
   "executionRoleArn": "${ecs_task_ex_role}",
   "jobRoleArn": "${job_role_arn}",
   "logConfiguration": {

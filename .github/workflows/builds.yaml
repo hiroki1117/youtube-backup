@@ -32,7 +32,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-actions@v3
+        uses: docker/metadata-action@v3
         with:
           images: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}
           tags: |
