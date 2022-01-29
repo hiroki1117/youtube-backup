@@ -140,6 +140,29 @@ resource "aws_ecr_repository" "youtubedl_registory" {
   }
 }
 
+resource "aws_ecr_lifecycle_policy" "for_youtubedl" {
+  repository = aws_ecr_repository.youtubedl_registory.name
+
+  policy = jsonencode(
+    {
+      rules = [
+        {
+          rulePriority = 5
+          description = "直近10イメージを保存"
+          action = {
+            type = "expire"
+          }
+          selection = {
+            countNumber = 10
+            countType = "imageCountMoreThan"
+            tagStatus = "any"
+          }
+        }
+      ]
+    }
+  )
+}
+
 #AWS Batchサービスロール
 module "iam_assumable_role_for_aws_batch_service" {
   source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
