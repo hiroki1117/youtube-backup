@@ -34,8 +34,9 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -recursive -check
 
-      - name: Terraform stg/20-frontend
+      - name: Terraform
         run: |
           terraform init
           terraform validate
-          terraform plan
+          terraform plan -var "custome_domain_name=${{ secrets.CUSTOM_DOMAIN_NAME }}" -var "hostzone=${{ HOSTZONE }}"
+
