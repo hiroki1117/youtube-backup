@@ -25,7 +25,17 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: github-action-youtubebackup-session
           aws-region: ap-northeast-1
-      
-      - run: aws s3 ls youtubedl-bucket
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.4
 
+      - name: Terraform Format
+        run: terraform fmt -recursive -check
+
+      - name: Terraform stg/20-frontend
+        run: |
+          terraform init
+          terraform validate
+          terraform plan
