@@ -191,7 +191,7 @@ module "iam_assumable_role_for_ec2_spot_fleet" {
 
   create_role = true
 
-   role_name         = "AmazonEC2SpotFleetRole"
+  role_name         = "AmazonEC2SpotFleetRole"
   role_requires_mfa = false
 
   custom_role_policy_arns = [
