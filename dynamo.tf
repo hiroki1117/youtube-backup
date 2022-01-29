@@ -56,6 +56,10 @@ resource "aws_backup_selection" "selection" {
   resources = [
     aws_dynamodb_table.youtube-backup-table.arn
   ]
+
+  # Objects have changed outside of Terraform対策
+  not_resources = []
+  condition {}
 }
 
 data "aws_iam_role" "BackupRole" {
