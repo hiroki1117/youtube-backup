@@ -34,4 +34,4 @@ jobs:
         with:
           context: ./youtube-dl-script
           push: true
-          tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+          tags: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }},${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
