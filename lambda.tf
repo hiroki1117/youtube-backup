@@ -22,7 +22,7 @@ resource "aws_lambda_function" "submitjob_lambda" {
 data "archive_file" "submitjob_batch" {
   type        = "zip"
   source_dir  = "./submit-job-lambda"
-  output_path = "submit-job-lambda.zip"
+  output_path = "./lambdazip/submit-job-lambda.zip"
 }
 
 #Lambdaのロール
@@ -68,7 +68,7 @@ resource "aws_lambda_function" "delete_video_lambda" {
 data "archive_file" "delete_video" {
   type        = "zip"
   source_dir  = "./delete-video-lambda"
-  output_path = "delete-video-lambda.zip"
+  output_path = "./lambdazip/delete-video-lambda.zip"
 }
 
 #Lambdaのロール
@@ -112,7 +112,7 @@ resource "aws_lambda_function" "video_upload_lambda" {
 data "archive_file" "video_upload" {
   type        = "zip"
   source_dir  = "./complete-video-upload"
-  output_path = "complete-video-upload.zip"
+  output_path = "./lambdazip/complete-video-upload.zip"
 }
 
 #Lambdaのロール
@@ -151,7 +151,7 @@ resource "aws_lambda_function" "scrapbox_backup_lambda" {
 data "archive_file" "scrapbox_backup" {
   type        = "zip"
   source_dir  = "./scrapbox-backup-lambda"
-  output_path = "scrapbox-backup-lambda.zip"
+  output_path = "./lambdazip/scrapbox-backup-lambda.zip"
 }
 
 #Lambdaのロール
@@ -193,7 +193,7 @@ resource "aws_lambda_function" "video_info_lambda" {
 data "archive_file" "video_info" {
   type        = "zip"
   source_dir  = "./video-info-lambda"
-  output_path = "video-info-lambda.zip"
+  output_path = "./lambdazip/video-info-lambda.zip"
 }
 
 
@@ -217,7 +217,7 @@ resource "aws_lambda_function" "video_list_lambda" {
 data "archive_file" "video_list" {
   type        = "zip"
   source_dir  = "./video-list-lambda"
-  output_path = "video-list-lambda.zip"
+  output_path = "./lambdazip/video-list-lambda.zip"
 }
 
 # S3urlにpresignedするlambda
@@ -240,7 +240,7 @@ resource "aws_lambda_function" "presigned_s3url_lambda" {
 data "archive_file" "presigned_s3url" {
   type        = "zip"
   source_dir  = "./presigned-s3url-lambda"
-  output_path = "presigned-s3url-lambda.zip"
+  output_path = "./lambdazip/presigned-s3url-lambda.zip"
 }
 
 resource "aws_iam_policy" "youtubebackupbacket_readonly_policy" {
