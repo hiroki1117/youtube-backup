@@ -1,12 +1,17 @@
-name: dockerbuild-ci
+name: build
+
 on:
   push:
     branches:
       - "main"
     paths:
       - "youtube-dl-script/*"
-  
+
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build:
