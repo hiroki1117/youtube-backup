@@ -38,5 +38,5 @@ jobs:
         run: |
           terraform init
           terraform validate
-          terraform plan -var "custome_domain_name=${{ secrets.CUSTOM_DOMAIN_NAME }}" -var "hostzone=${{ HOSTZONE }}"
+          terraform plan -var "custome_domain_name=${{ secrets.CUSTOM_DOMAIN_NAME }}" -var "hostzone=${{ secrets.HOSTZONE }}"
 
