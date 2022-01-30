@@ -10,15 +10,27 @@ from urllib.parse import parse_qs
 
 def lambda_handler(event, context):
     url = event['queryStringParameters']['url']
-
-    # 動画のid、タイトルなどの情報を取得
     video_controller = VideoController()
+    dynamo_client = DynamoClient()
+
+    # 動画データが既にバックアップ済みか確認する
+    video_id = video_controller.get_video_id_from_url(url)
+    check_video_item_or_none = dynamo_client.get_video_data(video_id)
+    if check_video_item_or_none is not None:
+        return response_template(
+            check_video_item_or_none["video_id"],
+            check_video_item_or_none["title"],
+            check_video_item_or_none["s3fullpath"],
+            True, # バックアップ済みでした
+            "" # バックアップ済みなのでaws_batch_jobも発行されていない
+        )
+
+    # 動画のid、タイトルなどの情報をプラットフォームAPIから取得
     video_data = video_controller.get_video_data(url)
 
     # DynamoDBに保存
-    dynamo_client = DynamoClient()
     is_inserted = dynamo_client.insert(video_data)
-    s3path = dynamo_client.get_video_s3path(video_data)
+    s3path = dynamo_client.get_video_s3path(video_data.id)
 
     # AWS Batchで動画保存処理
     batch_job_id = ""
@@ -26,14 +38,24 @@ def lambda_handler(event, context):
         batch_client = BatchClient()    
         batch_job_id = batch_client.submit_job(url, video_data)["jobId"]
      
-    response = {
+    return response_template(
+        video_data.id,
+        video_data.title,
+        s3path,
+        not is_inserted,
+        batch_job_id        
+    )
+
+
+def response_template(video_id, video_title, video_s3path, already_backup_flg, aws_batch_job_id):
+    return {
         "statusCode": 200,
         "body": json.dumps({
-            'video_id': video_data.id,
-            'title': video_data.title,
-            'already_backup': not is_inserted,
-            'batch_job_id': batch_job_id,
-            's3': s3path
+            'video_id': video_id,
+            'title': video_title,
+            'already_backup': already_backup_flg,
+            'batch_job_id': aws_batch_job_id,
+            's3': video_s3path
         }),
         "headers": {
             "Content-Type": "application/json",
@@ -42,8 +64,6 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Methods": 'OPTIONS,POST,GET'
         }
     }
-    return response
-
 
 
 class BatchClient:
@@ -88,7 +108,7 @@ class DynamoClient():
 
     def insert(self, videodata):
         # 既に保存されている場合はFalseを返してinsertしない
-        if self.__check_already_exists(videodata.id):
+        if self.get_video_data(videodata.id) is not None:
             return False
 
         response = self.table.put_item(
@@ -105,16 +125,30 @@ class DynamoClient():
 
         return True
     
-    def get_video_s3path(self, videodata):
-        res = self.table.get_item(Key={'video_id': videodata.id})
-        return res['Item']['s3fullpath'] if 'Item' in res else videodata.s3path
+    def get_video_s3path(self, video_id):
+        video_data_item = self.get_video_data(video_id)
+        if video_data_item is None:
+            raise Exception(f"登録後の動画データ検索に失敗しました video_id : {video_id}")
+        return video_data_item["s3fullpath"]
 
-    def __check_already_exists(self, video_id):
+    def get_video_data(self, video_id):
         res = self.table.get_item(Key={'video_id': video_id})
-        return True if 'Item' in res else False
+        return res["Item"] if 'Item' in res else None
 
 
 class VideoController():
+
+    def get_video_id_from_url(self, url):
+        if ("youtube" in url) | ("youtu.be" in url):
+            youtube_client = YoutubeClient()
+            video_id = youtube_client.get_video_id_from_url(url)
+        elif "twitter" in url:
+            twitter_client = TwitterClient()
+            video_id = twitter_client.get_video_id_from_url(url)
+        else:
+            raise Exception("対応していないurl")
+
+        return video_id
 
     def get_video_data(self, url):
         if ("youtube" in url) | ("youtu.be" in url):
@@ -140,6 +174,11 @@ class YoutubeClient():
         self.YOUTUBE_API_KEY = ssm_response['Parameters'][0]['Value']
         self.PLATFORM = 'youtube'
         self.NORMAL_YOUTUBE_BASE_URL = 'https://www.youtube.com/watch?v='
+
+    def get_video_id_from_url(self, url):
+        video_url = self._normalize_url(url)
+        video_id = self.__parse_url(video_url)
+        return video_id
     
     def video_info(self, video_url):
         video_url = self._normalize_url(video_url)
@@ -173,6 +212,10 @@ class YoutubeClient():
 class TwitterClient():
     def __init__(self):
         self.PLATFORM = 'twitter'
+
+    def get_video_id_from_url(self, url):
+        video_id = self.__parse_url(url)
+        return video_id
 
     def video_info(self, video_url):
         video_id = self.__parse_url(video_url)
