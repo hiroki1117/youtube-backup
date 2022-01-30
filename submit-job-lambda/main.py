@@ -7,6 +7,11 @@ import urllib.request
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
+JOB_QUEUE_NAME = os.environ["JOB_QUEUE_NAME"]
+JOB_DEFINITION_NAME = os.environ["JOB_DEFINITION_NAME"]
+JOB_REVISION = os.environ["JOB_REVISION"]
+DYNAMO_TABLE_NAME = os.environ["DYNAMO_TABLE_NAME"]
+BACKUP_BACKET = os.environ["BACKUP_BACKET"]
 
 def lambda_handler(event, context):
     url = event['queryStringParameters']['url']
@@ -70,8 +75,8 @@ class BatchClient:
 
     def __init__(self):
         self.client = boto3.client("batch")
-        self.job_queue = os.environ["JOB_QUEUE_NAME"]
-        self.job_definition = os.environ["JOB_DEFINITION_NAME"] + ":" + os.environ["JOB_REVISION"]
+        self.job_queue = JOB_QUEUE_NAME
+        self.job_definition = JOB_DEFINITION_NAME + ":" + JOB_REVISION
         self.jobname = "youtubedljob-from-lambda"
 
     def submit_job(self, url, video_data):
@@ -104,7 +109,7 @@ class DynamoClient():
 
     def __init__(self):
         self.dynamo_client = boto3.resource("dynamodb")
-        self.table = self.dynamo_client.Table(os.environ["DYNAMO_TABLE_NAME"])
+        self.table = self.dynamo_client.Table(DYNAMO_TABLE_NAME)
 
     def insert(self, videodata):
         # 既に保存されている場合はFalseを返してinsertしない
@@ -196,7 +201,7 @@ class YoutubeClient():
             url=video_url,
             platform=self.PLATFORM,
             title=video_json['items'][0]['snippet']['title'],
-            s3path=f's3://youtubedl-bucket/{self.PLATFORM}/{day.year}/{day.month}/{day.day}/',
+            s3path=f's3://{BACKUP_BACKET}/{self.PLATFORM}/{day.year}/{day.month}/{day.day}/',
             backupdate=str(day),
             # video_idが-から始まる場合は-から始まるファイル名はawscliでオプションと勘違いされてエラーになる
             # 回避するためにABCXYZの接頭をつけることにする
@@ -227,7 +232,7 @@ class TwitterClient():
             url=video_url,
             platform=self.PLATFORM,
             title=None,
-            s3path=f's3://youtubedl-bucket/{self.PLATFORM}/{day.year}/{day.month}/{day.day}/',
+            s3path=f's3://{BACKUP_BACKET}/{self.PLATFORM}/{day.year}/{day.month}/{day.day}/',
             backupdate=str(day),
             backup_filename=video_id + '.mp4'
         )
