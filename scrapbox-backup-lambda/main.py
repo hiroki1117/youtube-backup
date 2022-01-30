@@ -4,6 +4,7 @@ import json
 import boto3
 import urllib.request
 from urllib.parse import quote
+from functools import reduce
 
 def lambda_handler(event, context):
     
@@ -12,10 +13,11 @@ def lambda_handler(event, context):
         Names = [('/youtube-backup/scrapbox-credentials'), ('/youtube-backup/scrapbox-projects')],
         WithDecryption=True
     )
+    f = lambda z: lambda x,y: y["Value"] if y["Name"]==z else x
     YOUTUBE_BACKUP_ENDPOINT = os.environ["SUBMIT_JOB_ENDPOINT"]
-    SCRAPBOX_CREDENTIALS = ssm_response['Parameters'][0]['Value']
+    SCRAPBOX_CREDENTIALS = reduce(f('/youtube-backup/scrapbox-credentials'), ssm_response['Parameters'], "")
     # hoge,fuga,...形式
-    SCRAPBOX_PROJECTS = ssm_response['Parameters'][1]['Value']
+    SCRAPBOX_PROJECTS = reduce(f('/youtube-backup/scrapbox-projects'), ssm_response['Parameters'], "")
 
     LIMIT = "10"
     base_endpoint = "https://scrapbox.io/api/pages/"

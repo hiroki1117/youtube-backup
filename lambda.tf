@@ -8,6 +8,8 @@ resource "aws_lambda_function" "submitjob_lambda" {
 
   runtime = "python3.8"
 
+  layers = ["arn:aws:lambda:ap-northeast-1:770693421928:layer:Klayers-python38-tweepy:1"]
+
   environment {
     variables = {
       JOB_DEFINITION_NAME = var.youtube_dl_job_definition_name
