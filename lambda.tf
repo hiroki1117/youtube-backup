@@ -16,7 +16,7 @@ resource "aws_lambda_function" "submitjob_lambda" {
       JOB_REVISION        = aws_batch_job_definition.youtube_dl_job_definition.revision
       JOB_QUEUE_NAME      = var.youtube_dl_job_queue_name
       DYNAMO_TABLE_NAME   = aws_dynamodb_table.youtube-backup-table.name
-      BACKUP_BACKET = aws_s3_bucket.youtubedl_bucket.bucket
+      BACKUP_BACKET       = aws_s3_bucket.youtubedl_bucket.bucket
     }
   }
 }
