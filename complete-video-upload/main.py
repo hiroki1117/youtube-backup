@@ -7,9 +7,10 @@ def lambda_handler(event, context):
     video_id = os.path.basename(object_key).split('.')[0]
     update_video_upload_status(video_id)
 
-def update_video_upload_status(video_id):
+def update_video_upload_status(video_id_special_process(video_id)):
     dynamo_client = boto3.resource("dynamodb")
     table = dynamo_client.Table(os.environ["DYNAMO_TABLE_NAME"])
+    # ここでS3のパスも更新するようにしたらmp4以外にも対応できるかも
     response = table.update_item(
         Key={
             'video_id': video_id
@@ -21,3 +22,9 @@ def update_video_upload_status(video_id):
         ReturnValues="UPDATED_NEW"
     )
     return response
+
+# IDが-から始まる場合は特別な処理をしているのでその変換
+def video_id_special_process(video_id):
+    if video_id.startswith("ABCXYZ-"):
+        return video_id[7:]
+    return video_id

@@ -3,6 +3,7 @@ set -eu
 
 echo $URL
 echo $FILENAME
+echo ${S3PATH}
 
 # youtube-dl -o "$FILENAME" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best" --merge-output-format mp4 "$URL"
 # youtube-dl -o "$FILENAME" -f "best[ext=mp4]" "$URL"

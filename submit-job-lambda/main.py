@@ -205,7 +205,7 @@ class YoutubeClient():
             backupdate=str(day),
             # video_idが-から始まる場合は-から始まるファイル名はawscliでオプションと勘違いされてエラーになる
             # 回避するためにABCXYZの接頭をつけることにする
-            backup_filename=video_id + '.mp4' if not video_id.startswith.("-") else "ABCXYZ" + video_id + ".mp4"
+            backup_filename=video_id + '.mp4' if not video_id.startswith("-") else "ABCXYZ" + video_id + ".mp4"
         )
     
     def __parse_url(self, url):
