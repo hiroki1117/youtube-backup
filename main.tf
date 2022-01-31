@@ -110,6 +110,9 @@ resource "aws_batch_job_queue" "youtubedl_batch_queue" {
 resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   name = var.youtube_dl_job_definition_name
   type = "container"
+  timeout {
+    attempt_duration_seconds = 7200
+  }
   container_properties = templatefile("./batch_container_definitions.tpl",
     {
       job_role_arn     = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
