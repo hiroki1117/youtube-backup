@@ -35,8 +35,15 @@ def process(video_id):
             'video_data': None
         }
 
-    s3result = s3_client.delete_object(video_data['s3fullpath'])
 
+    if not s3_client.checks3exists(video_data['s3fullpath']):
+        return {
+            'result': 'error',
+            'description': '(バックアップ中)Dynamoに登録されているがS3に存在しません。',
+            'video_data': video_data
+        }
+
+    s3result = s3_client.delete_object(video_data['s3fullpath'])
     if not s3result:
         return {
             'result': 'error',
@@ -94,6 +101,15 @@ class S3Client():
         status = res['ResponseMetadata']['HTTPStatusCode']
 
         return status == 204
+
+    # 指定のkeyが存在するか確認
+    def checks3exists(self, s3fullpath):
+        bucket, key = self.__parse_s3fullpath(s3fullpath)
+        try:
+            self.s3_client.head_object(Bucket=bucket, Key=key)
+            return True
+        except:
+            return False
 
     def __parse_s3fullpath(self, s3fullpath):
         tmp = urlparse(s3fullpath)
