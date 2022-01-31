@@ -13,8 +13,8 @@
     },
     "secretOptions": []
   },
-  "memory": 512,
-  "vcpus": 1,
+  "memory": 1024,
+  "vcpus": 2,
   "command" : ["bash","main.sh"],
   "type": "container",
   "environment": [],
