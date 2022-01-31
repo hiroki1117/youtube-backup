@@ -1,4 +1,5 @@
 import os
+import time
 import boto3
 import tweepy
 import json
@@ -168,7 +169,8 @@ class DynamoClient():
                 'title': videodata.title,
                 'backupdate': videodata.backupdate,
                 's3fullpath': videodata.s3path + videodata.backup_filename,
-                'upload_status': "init"
+                'upload_status': "init",
+                'request_timestamp': str(int(time.time()))
             }
         )
 
