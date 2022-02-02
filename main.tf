@@ -111,7 +111,7 @@ resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   name = var.youtube_dl_job_definition_name
   type = "container"
   timeout {
-    attempt_duration_seconds = 7200
+    attempt_duration_seconds = 10800
   }
   container_properties = templatefile("./batch_container_definitions.tpl",
     {
