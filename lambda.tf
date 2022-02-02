@@ -62,9 +62,9 @@ resource "aws_lambda_function" "delete_video_lambda" {
   environment {
     variables = {
       DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
+      BATCH_JOB_TIMEOUT = aws_batch_job_definition.youtube_dl_job_definition.timeout[0].attempt_duration_seconds
     }
   }
-
 }
 
 data "archive_file" "delete_video" {

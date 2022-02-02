@@ -1,5 +1,6 @@
 import os
 import boto3
+import time
 import json
 from urllib.parse import urlparse
 
@@ -35,8 +36,8 @@ def process(video_id):
             'video_data': None
         }
 
-
-    if not s3_client.checks3exists(video_data['s3fullpath']):
+    if (video_data["upload_status"] == "init") and check_backupprocessing(video_data):
+        # バックアップ中
         return {
             'result': 'error',
             'description': '(バックアップ中)Dynamoに登録されているがS3に存在しません。',
@@ -66,6 +67,20 @@ def process(video_id):
         'video_data': video_data
     }
 
+def check_backupprocessing(video_data):
+    # request_timeoutが存在しない
+    if "request_timestamp" not in video_data:
+        return False
+
+    request_timestamp = int(video_data["request_timestamp"])
+    now_timestamp = int(time.time())
+    batch_job_timeout = int(os.environ["BATCH_JOB_TIMEOUT"])
+    if (now_timestamp-request_timestamp) < batch_job_timeout:
+        # 処理中
+        return True
+    else:
+        # タイムアウトでバックアップ失敗している
+        return False
 
 
 class DynamoClient():
