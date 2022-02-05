@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     # hoge,fuga,...形式
     SCRAPBOX_PROJECTS = reduce(f('/youtube-backup/scrapbox-projects'), ssm_response['Parameters'], "")
 
-    LIMIT = "10"
+    LIMIT = "25"
     base_endpoint = "https://scrapbox.io/api/pages/"
     header = {
         "Cookie": "connect.sid="+SCRAPBOX_CREDENTIALS
