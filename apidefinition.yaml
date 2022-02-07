@@ -1,6 +1,16 @@
 swagger: '2.0'
 schemes:
   - https
+definitions:
+  Empty:
+    type: object
+    title: Empty Schema
+info:
+  title: youtubebackupapi
+  version: '1'
+  description: youtube backup
+produces:
+  - application/json
 paths:
   /videobackup-submit:
     get:
@@ -133,13 +143,3 @@ paths:
           name: video_id
           description: 動画id
           required: true
-definitions:
-  Empty:
-    type: object
-    title: Empty Schema
-info:
-  title: youtubebackupapi
-  version: '1'
-  description: youtube backup
-produces:
-  - application/json
