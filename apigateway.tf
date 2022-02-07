@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
     types = ["REGIONAL"]
   }
 
-  body = templatefile("./apidefinition.json", {
+  body = templatefile("./apidefinition.yaml", {
     submit-job-lambda_arn      = aws_lambda_function.submitjob_lambda.invoke_arn
     video-info-lambda_arn      = aws_lambda_function.video_info_lambda.invoke_arn
     delete-video-lambda_arn    = aws_lambda_function.delete_video_lambda.invoke_arn
