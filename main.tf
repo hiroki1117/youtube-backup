@@ -111,7 +111,7 @@ resource "aws_batch_compute_environment" "youtubedl_batch_fargate" {
   compute_environment_name = "youtubedl-batch-fargate"
 
   compute_resources {
-    max_vcpus           = var.instance_settings["max_vcpus"]
+    max_vcpus = var.instance_settings["max_vcpus"]
     min_vcpus = var.instance_settings["min_vcpus"]
 
     security_group_ids = [
@@ -125,7 +125,7 @@ resource "aws_batch_compute_environment" "youtubedl_batch_fargate" {
 
   service_role = module.iam_assumable_role_for_aws_batch_service.iam_role_arn
   type         = "MANAGED"
-  depends_on   = [
+  depends_on = [
     module.iam_assumable_role_for_ec2_spot_fleet,
     module.iam_assumable_role_for_aws_batch_service,
     module.iam_assumable_role_for_ecs_instance_role
