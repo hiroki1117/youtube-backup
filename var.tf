@@ -71,6 +71,11 @@ variable "youtube_dl_job_queue_name" {
   default = "youtubedl-batch-queue"
 }
 
+variable "youtube_dl_job_fargate_queue_name" {
+  type    = string
+  default = "youtubedl-batch-fargate-queue"
+}
+
 variable "api_gateway_stagename" {
   type    = string
   default = "prod"

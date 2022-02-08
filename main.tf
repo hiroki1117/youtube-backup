@@ -106,6 +106,46 @@ resource "aws_batch_job_queue" "youtubedl_batch_queue" {
   }
 }
 
+# Fargate環境
+resource "aws_batch_compute_environment" "youtubedl_batch_fargate" {
+  compute_environment_name = "youtubedl-batch-fargate"
+
+  compute_resources {
+    max_vcpus           = var.instance_settings["max_vcpus"]
+    min_vcpus = var.instance_settings["min_vcpus"]
+
+    security_group_ids = [
+      aws_security_group.sg.id
+    ]
+
+    subnets = module.vpc.public_subnets
+
+    type = "FARGATE_SPOT"
+  }
+
+  service_role = module.iam_assumable_role_for_aws_batch_service.iam_role_arn
+  type         = "MANAGED"
+  depends_on   = [
+    module.iam_assumable_role_for_ec2_spot_fleet,
+    module.iam_assumable_role_for_aws_batch_service,
+    module.iam_assumable_role_for_ecs_instance_role
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_batch_job_queue" "youtubedl_batch_fargate_queue" {
+  name                 = var.youtube_dl_job_fargate_queue_name
+  state                = "ENABLED"
+  priority             = 1
+  compute_environments = [aws_batch_compute_environment.youtubedl_batch_fargate.arn]
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 #ジョブ定義
 resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   name = var.youtube_dl_job_definition_name
