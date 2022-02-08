@@ -19,5 +19,8 @@
       "awslogs-group": "${log_group}"
     },
     "secretOptions": []
+  },
+  "networkConfiguration": { 
+   "assignPublicIp": "ENABLED"
   }
 }

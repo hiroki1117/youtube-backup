@@ -12,9 +12,12 @@ resource "aws_lambda_function" "submitjob_lambda" {
 
   environment {
     variables = {
-      JOB_DEFINITION_NAME = var.youtube_dl_job_definition_name
-      JOB_REVISION        = aws_batch_job_definition.youtube_dl_job_definition.revision
-      JOB_QUEUE_NAME      = var.youtube_dl_job_queue_name
+      # JOB_DEFINITION_NAME = var.youtube_dl_job_definition_name
+      # JOB_REVISION        = aws_batch_job_definition.youtube_dl_job_definition.revision
+      # JOB_QUEUE_NAME      = var.youtube_dl_job_queue_name
+      JOB_DEFINITION_NAME = var.youtube_dl_job_fargate_definition_name
+      JOB_REVISION        = aws_batch_job_definition.youtube_dl_job_fargate_definition.revision
+      JOB_QUEUE_NAME      = var.youtube_dl_job_fargate_queue_name
       DYNAMO_TABLE_NAME   = aws_dynamodb_table.youtube-backup-table.name
       BACKUP_BACKET       = aws_s3_bucket.youtubedl_bucket.bucket
     }
