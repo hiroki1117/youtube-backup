@@ -66,6 +66,11 @@ variable "youtube_dl_job_definition_name" {
   default = "youtube-dl-job-definition"
 }
 
+variable "youtube_dl_job_fargate_definition_name" {
+  type    = string
+  default = "youtube-dl-job-fargate-definition"
+}
+
 variable "youtube_dl_job_queue_name" {
   type    = string
   default = "youtubedl-batch-queue"

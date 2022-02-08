@@ -163,6 +163,27 @@ resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   )
 }
 
+#Fargate用のジョブ定義
+resource "aws_batch_job_definition" "youtube_dl_job_fargate_definition" {
+  name = var.youtube_dl_job_fargate_definition_name
+  type = "container"
+  platform_capabilities = [
+    "FARGATE",
+  ]
+  timeout {
+    attempt_duration_seconds = 10800
+  }
+  container_properties = templatefile("./batch_container_definitions_fargate.tpl",
+    {
+      job_role_arn     = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
+      log_group        = var.youtube_dl_job_log_group_name,
+      ecs_task_ex_role = data.aws_iam_role.ecsTaskExecutionRole.arn,
+      ecr_name         = aws_ecr_repository.youtubedl_registory.repository_url
+    }
+  )
+}
+
+
 data "aws_iam_role" "ecsTaskExecutionRole" {
   name = "ecsTaskExecutionRole"
 }

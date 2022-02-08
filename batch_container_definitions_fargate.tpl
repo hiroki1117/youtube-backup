@@ -1,7 +1,14 @@
-
 {
-  "jobDefinitionName": "youtube-dl-job-definition",
+  "jobDefinitionName": "youtube-dl-job-fargate-definition",
   "image": "${ecr_name}:latest",
+  "command": ["bash","main.sh"],
+  "fargatePlatformConfiguration": {
+    "platformVersion": "LATEST"
+  },
+  "resourceRequirements": [
+    {"type": "VCPU", "value": "1"},
+    {"type": "MEMORY", "value": "2048"}
+  ],
   "executionRoleArn": "${ecs_task_ex_role}",
   "jobRoleArn": "${job_role_arn}",
   "logConfiguration": {
@@ -12,16 +19,5 @@
       "awslogs-group": "${log_group}"
     },
     "secretOptions": []
-  },
-  "memory": 1024,
-  "vcpus": 2,
-  "command" : ["bash","main.sh"],
-  "type": "container",
-  "environment": [],
-  "mountPoints": [],
-  "secrets": [],
-  "ulimits": [],
-  "volumes": [],
-  "parameters": [],
-  "tags": {}
+  }
 }
