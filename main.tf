@@ -227,6 +227,38 @@ resource "aws_ecr_lifecycle_policy" "for_youtubedl" {
   )
 }
 
+resource "aws_ecr_repository" "ytdlp_registory" {
+  name                 = "youtube-downloader-ytdlp"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_lifecycle_policy" "ytdlp_registory" {
+  repository = aws_ecr_repository.ytdlp_registory.name
+
+  policy = jsonencode(
+    {
+      rules = [
+        {
+          rulePriority = 5
+          description  = "直近3イメージを保存"
+          action = {
+            type = "expire"
+          }
+          selection = {
+            countNumber = 3
+            countType   = "imageCountMoreThan"
+            tagStatus   = "any"
+          }
+        }
+      ]
+    }
+  )
+}
+
 #AWS Batchサービスロール
 module "iam_assumable_role_for_aws_batch_service" {
   source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"

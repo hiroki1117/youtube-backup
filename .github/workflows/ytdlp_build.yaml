@@ -5,7 +5,7 @@ on:
     branches:
       - "main"
     paths:
-      - "youtube-dl-script/*"
+      - "yt-dlp-script/*"
 
   workflow_dispatch:
 
@@ -42,7 +42,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ secrets.ECR_REGISTRY }}/${{ secrets.YOUTUBEDL_ECR_REPOSITORY }}
+          images: ${{ secrets.ECR_REGISTRY }}/${{ secrets.YTDLP_ECR_REPOSITORY }}
           tags: |
             type=sha
             type=raw,value=latest
@@ -59,4 +59,3 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
