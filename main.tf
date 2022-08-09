@@ -153,7 +153,7 @@ resource "aws_batch_job_definition" "youtube_dl_job_definition" {
   timeout {
     attempt_duration_seconds = 10800
   }
-  container_properties = templatefile("./batch_container_definitions.tpl",
+  container_properties = templatefile("./batch_definition_template/batch_container_definitions.tpl",
     {
       job_role_arn     = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
       log_group        = var.youtube_dl_job_log_group_name,
@@ -173,7 +173,7 @@ resource "aws_batch_job_definition" "youtube_dl_job_fargate_definition" {
   timeout {
     attempt_duration_seconds = 10800
   }
-  container_properties = templatefile("./batch_container_definitions_fargate.tpl",
+  container_properties = templatefile("./batch_definition_template/batch_container_definitions_fargate.tpl",
     {
       job_role_arn     = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
       log_group        = var.youtube_dl_job_log_group_name,
