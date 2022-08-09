@@ -13,6 +13,8 @@ from functools import reduce
 JOB_QUEUE_NAME = os.environ["JOB_QUEUE_NAME"]
 JOB_DEFINITION_NAME = os.environ["JOB_DEFINITION_NAME"]
 JOB_REVISION = os.environ["JOB_REVISION"]
+YTDLP_JOB_DEFINITION_NAME = os.environ["YTDLP_JOB_DEFINITION_NAME"]
+YTDLP_JOB_REVISION = os.environ["YTDLP_JOB_REVISION"]
 DYNAMO_TABLE_NAME = os.environ["DYNAMO_TABLE_NAME"]
 BACKUP_BACKET = os.environ["BACKUP_BACKET"]
 
@@ -123,8 +125,9 @@ class BatchClient:
         self.job_queue = JOB_QUEUE_NAME
         self.job_definition = JOB_DEFINITION_NAME + ":" + JOB_REVISION
         self.jobname = "youtubedljob-from-lambda"
+        self.ytdlp_job_definition = YTDLP_JOB_DEFINITION_NAME + ":" + YTDLP_JOB_REVISION
 
-    def submit_job(self, url, video_data):
+    def submit_job(self, url, video_data):           
         container_overrides={
             'environment': [
                 {
@@ -142,12 +145,21 @@ class BatchClient:
             ]
         }
         
-        return self.client.submit_job(
-            jobName=self.jobname,
-            jobQueue=self.job_queue,
-            jobDefinition=self.job_definition,
-            containerOverrides=container_overrides
-        )
+        #youtubeの場合だけ実験的にytdlpを使う
+        if video_data.platform == "youtube":
+            return self.client.submit_job(
+                jobName=self.jobname,
+                jobQueue=self.job_queue,
+                jobDefinition=self.ytdlp_job_definition,
+                containerOverrides=container_overrides
+            )
+        else:
+            return self.client.submit_job(
+                jobName=self.jobname,
+                jobQueue=self.job_queue,
+                jobDefinition=self.job_definition,
+                containerOverrides=container_overrides
+            )
 
 
 class DynamoClient():

@@ -20,6 +20,10 @@ resource "aws_lambda_function" "submitjob_lambda" {
       JOB_QUEUE_NAME      = var.youtube_dl_job_fargate_queue_name
       DYNAMO_TABLE_NAME   = aws_dynamodb_table.youtube-backup-table.name
       BACKUP_BACKET       = aws_s3_bucket.youtubedl_bucket.bucket
+
+      #ytdlpを実験的に導入
+      YTDLP_JOB_DEFINITION_NAME = aws_batch_job_definition.ytdlp_job_fargate_definition.name
+      YTDLP_JOB_REVISION = aws_batch_job_definition.ytdlp_job_fargate_definition.revision
     }
   }
 }

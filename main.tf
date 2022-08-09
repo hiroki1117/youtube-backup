@@ -183,6 +183,27 @@ resource "aws_batch_job_definition" "youtube_dl_job_fargate_definition" {
   )
 }
 
+#ytdlpジョブ定義
+#実験的に導入
+resource "aws_batch_job_definition" "ytdlp_job_fargate_definition" {
+  name = "ytdlp-job-definition"
+  type = "container"
+  platform_capabilities = [
+    "FARGATE",
+  ]
+  timeout {
+    attempt_duration_seconds = 10800
+  }
+  container_properties = templatefile("./batch_definition_template/ytdlp_batch_definition.tpl",
+    {
+      job_role_arn     = module.iam_assumable_role_for_youtubedl_batchjob.iam_role_arn,
+      log_group        = var.youtube_dl_job_log_group_name,
+      ecs_task_ex_role = data.aws_iam_role.ecsTaskExecutionRole.arn,
+      ecr_name         = aws_ecr_repository.ytdlp_registory.repository_url
+    }
+  )
+}
+
 
 data "aws_iam_role" "ecsTaskExecutionRole" {
   name = "ecsTaskExecutionRole"
