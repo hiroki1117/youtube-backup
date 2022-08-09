@@ -1,4 +1,4 @@
-name: build
+name: ytdop_build
 
 on:
   push:

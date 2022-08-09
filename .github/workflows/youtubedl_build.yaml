@@ -1,4 +1,4 @@
-name: build
+name: youtubedl_build
 
 on:
   push:
