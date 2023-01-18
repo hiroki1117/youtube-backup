@@ -3,6 +3,7 @@ import time
 import boto3
 import tweepy
 import json
+import hashlib
 import dataclasses
 import datetime
 import urllib.request
@@ -144,22 +145,13 @@ class BatchClient:
                 }
             ]
         }
-        
-        #youtubeの場合だけ実験的にytdlpを使う
-        if video_data.platform == "youtube":
-            return self.client.submit_job(
-                jobName=self.jobname,
-                jobQueue=self.job_queue,
-                jobDefinition=self.ytdlp_job_definition,
-                containerOverrides=container_overrides
-            )
-        else:
-            return self.client.submit_job(
-                jobName=self.jobname,
-                jobQueue=self.job_queue,
-                jobDefinition=self.job_definition,
-                containerOverrides=container_overrides
-            )
+
+        return self.client.submit_job(
+            jobName=self.jobname,
+            jobQueue=self.job_queue,
+            jobDefinition=self.ytdlp_job_definition,
+            containerOverrides=container_overrides
+        )
 
 
 class DynamoClient():
@@ -209,7 +201,8 @@ class VideoController():
             twitter_client = TwitterClient()
             video_id = twitter_client.get_video_id_from_url(url)
         else:
-            raise Exception("対応していないurl")
+            other_client = OtherPlatformClient()
+            video_id = other_client.get_video_id_from_url(url)
 
         return video_id
 
@@ -221,7 +214,8 @@ class VideoController():
             twitter_client = TwitterClient()
             video_data = twitter_client.video_info(url)
         else:
-            raise Exception("対応していないurl")
+            other_client = OtherPlatformClient()
+            video_data = other_client.video_info(url)
 
         return video_data
 
@@ -323,6 +317,31 @@ class TwitterClient():
     def __parse_url(self, url):
         return urlparse(url).path.split('/')[-1]
 
+
+# Youtube/Twitter以外のプラットフォームの動画
+class OtherPlatformClient():
+        
+    def get_video_id_from_url(self, url):
+        return self.__sha256str15(url)
+    
+    def video_info(self, video_url):
+        video_id = self.__sha256str15(video_url)
+        platform = urlparse(video_url).netloc
+        
+        day = datetime.date.today()
+        return VideoData(
+            id=video_id,
+            url=video_url,
+            platform=platform,
+            title=video_id,
+            s3path=f's3://{BACKUP_BACKET}/{platform}/{day.year}/{day.month}/{day.day}/',
+            backupdate=str(day),
+            backup_filename=video_id + '.mp4'
+        )
+        
+    def __sha256str15(self, url):
+        hs = hashlib.sha256(url.encode()).hexdigest()
+        return hs[0:15]
 
 @dataclasses.dataclass
 class VideoData():
