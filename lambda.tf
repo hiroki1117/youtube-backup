@@ -293,3 +293,46 @@ module "iam_assumable_role_for_presigned_s3url_lambda" {
     aws_iam_policy.youtubebackupbacket_readonly_policy.arn
   ]
 }
+
+
+#動画情報をアップデートするlambda
+resource "aws_lambda_function" "update_video_lambda" {
+  filename         = data.archive_file.update_video.output_path
+  function_name    = "update-video-lambda"
+  role             = module.iam_assumable_role_for_deletevideo_lambda.iam_role_arn
+  handler          = "main.lambda_handler"
+  source_code_hash = data.archive_file.update_video.output_base64sha256
+
+  runtime = "python3.8"
+
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.youtube-backup-table.name
+    }
+  }
+}
+
+data "archive_file" "update_video" {
+  type        = "zip"
+  source_dir  = "./update-video-lambda"
+  output_path = "./lambdazip/update-video-lambda.zip"
+}
+
+#Lambdaのロール
+module "iam_assumable_role_for_updatevideo_lambda" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  trusted_role_services = [
+    "lambda.amazonaws.com"
+  ]
+
+  create_role = true
+
+  role_name         = "UpdateVideoLambdaRole"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+  ]
+}

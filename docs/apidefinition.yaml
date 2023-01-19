@@ -99,6 +99,38 @@ paths:
           description: バックアップ動画に振られる一意のIDはオリジナル動画のurlから決定される
           required: true
       description: 動画情報を取得する
+    post:
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: video_id
+          description: "video_id"
+          required: true
+        - in: body
+          name: title
+          description: "title"
+          required: true
+      description: 動画情報をアップデートする
+      responses:
+        '200':
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+          examples:
+            succ:
+              result: succ
+            NotFound:
+              result: error
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: '${update-video-lambda_arn}'
+        responses:
+          default:
+            statusCode: '200'
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
   /video-delete:
     get:
       produces:
