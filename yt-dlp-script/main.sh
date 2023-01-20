@@ -1,5 +1,5 @@
 #!/bin/sh
-set -u
+set -eux
 
 echo $URL
 echo $FILENAME
