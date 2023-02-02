@@ -1,0 +1,80 @@
+swagger: '2.0'
+schemes:
+  - https
+definitions:
+  Empty:
+    type: object
+    title: Empty Schema
+info:
+  title: youtubebackupapi
+  version: '1'
+  description: youtube backup
+produces:
+  - application/json
+paths:
+  /video:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-video
+    post:
+      summary: ''
+      operationId: post-video
+      responses:
+        '200':
+          description: OK
+          examples: {}
+          schema:
+            type: object
+            properties:
+              result:
+                type: string
+              description:
+                type: string
+              video_data:
+                type: object
+                properties:
+                  video_id:
+                    type: string
+                  title:
+                    type: string
+                  already_backup:
+                    type: boolean
+                  batch_job_id:
+                    type: string
+                  s3:
+                    type: string
+            required:
+              - result
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+  '/video/{video_id}':
+    parameters:
+      - type: string
+        name: video_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-video-video_id
+    patch:
+      summary: ''
+      operationId: patch-video-video_id
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: ''
+      operationId: delete-video-video_id
+      responses:
+        '200':
+          description: OK
