@@ -7,7 +7,7 @@ def lambda_handler(event, context):
     bucket_name = event['Records'][0]['s3']['bucket']['name']
     s3path = "s3://" + bucket_name + "/" + object_key
     video_id = os.path.basename(object_key).split('.')[0]
-    update_video_upload_status(video_id_special_process(video_id))
+    update_video_upload_status(video_id_special_process(video_id), s3path)
     print(video_id)
     print(video_id_special_process(video_id))
 
