@@ -251,7 +251,7 @@ class YoutubeClient():
             backupdate=str(day),
             # video_idが-から始まる場合は-から始まるファイル名はawscliでオプションと勘違いされてエラーになる
             # 回避するためにABCXYZの接頭をつけることにする
-            backup_filename=video_id + '.mp4' if not video_id.startswith("-") else "ABCXYZ" + video_id + ".mp4"
+            backup_filename=video_id if not video_id.startswith("-") else "ABCXYZ" + video_id
         )
     
     def __parse_url(self, url):
@@ -290,7 +290,7 @@ class TwitterClient():
             title=self.__get_tweet_text(video_id),
             s3path=f's3://{BACKUP_BACKET}/{self.PLATFORM}/{day.year}/{day.month}/{day.day}/',
             backupdate=str(day),
-            backup_filename=video_id + '.mp4'
+            backup_filename=video_id
         )
     
     # tweetに動画データがあるか/無効なtweet_idじゃないか確認する
@@ -336,7 +336,7 @@ class OtherPlatformClient():
             title=video_id,
             s3path=f's3://{BACKUP_BACKET}/{platform}/{day.year}/{day.month}/{day.day}/',
             backupdate=str(day),
-            backup_filename=video_id + '.mp4'
+            backup_filename=video_id
         )
         
     def __sha256str15(self, url):

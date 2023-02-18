@@ -4,12 +4,14 @@ import json
 
 def lambda_handler(event, context):
     object_key = event['Records'][0]['s3']['object']['key']
+    bucket_name = event['Records'][0]['s3']['bucket']['name']
+    s3path = "s3://" + bucket_name + "/" + object_key
     video_id = os.path.basename(object_key).split('.')[0]
     update_video_upload_status(video_id_special_process(video_id))
     print(video_id)
     print(video_id_special_process(video_id))
 
-def update_video_upload_status(video_id):
+def update_video_upload_status(video_id, s3path):
     dynamo_client = boto3.resource("dynamodb")
     table = dynamo_client.Table(os.environ["DYNAMO_TABLE_NAME"])
 
@@ -18,9 +20,10 @@ def update_video_upload_status(video_id):
         Key={
             'video_id': video_id
         },
-        UpdateExpression="set upload_status = :status",
+        UpdateExpression="set upload_status = :status, s3fullpath = :s3path",
         ExpressionAttributeValues={
-            ':status': 'complete'
+            ':status': 'complete',
+            ':s3path': s3path
         },
         ReturnValues="UPDATED_NEW"
     )
