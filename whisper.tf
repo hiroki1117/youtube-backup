@@ -1,6 +1,6 @@
 #Batch
 resource "aws_batch_compute_environment" "gpu_batch" {
-  compute_environment_name = "gpu-batch"
+  compute_environment_name = "gpu-batch2"
 
   compute_resources {
     type                = "EC2"
