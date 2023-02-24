@@ -30,7 +30,7 @@ resource "aws_lambda_function" "submitjob_lambda" {
 
 data "archive_file" "submitjob_batch" {
   type        = "zip"
-  source_dir  = "./submit-job-lambda"
+  source_dir  = "./lambda/submit-job-lambda"
   output_path = "./lambdazip/submit-job-lambda.zip"
 }
 
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "delete_video_lambda" {
 
 data "archive_file" "delete_video" {
   type        = "zip"
-  source_dir  = "./delete-video-lambda"
+  source_dir  = "./lambda/delete-video-lambda"
   output_path = "./lambdazip/delete-video-lambda.zip"
 }
 
@@ -120,7 +120,7 @@ resource "aws_lambda_function" "video_upload_lambda" {
 
 data "archive_file" "video_upload" {
   type        = "zip"
-  source_dir  = "./complete-video-upload"
+  source_dir  = "./lambda/complete-video-upload"
   output_path = "./lambdazip/complete-video-upload.zip"
 }
 
@@ -164,7 +164,7 @@ resource "aws_lambda_function" "scrapbox_backup_lambda" {
 
 data "archive_file" "scrapbox_backup" {
   type        = "zip"
-  source_dir  = "./scrapbox-backup-lambda"
+  source_dir  = "./lambda/scrapbox-backup-lambda"
   output_path = "./lambdazip/scrapbox-backup-lambda.zip"
 }
 
@@ -206,7 +206,7 @@ resource "aws_lambda_function" "video_info_lambda" {
 
 data "archive_file" "video_info" {
   type        = "zip"
-  source_dir  = "./video-info-lambda"
+  source_dir  = "./lambda/video-info-lambda"
   output_path = "./lambdazip/video-info-lambda.zip"
 }
 
@@ -230,7 +230,7 @@ resource "aws_lambda_function" "video_list_lambda" {
 
 data "archive_file" "video_list" {
   type        = "zip"
-  source_dir  = "./video-list-lambda"
+  source_dir  = "./lambda/video-list-lambda"
   output_path = "./lambdazip/video-list-lambda.zip"
 }
 
@@ -253,7 +253,7 @@ resource "aws_lambda_function" "presigned_s3url_lambda" {
 
 data "archive_file" "presigned_s3url" {
   type        = "zip"
-  source_dir  = "./presigned-s3url-lambda"
+  source_dir  = "./lambda/presigned-s3url-lambda"
   output_path = "./lambdazip/presigned-s3url-lambda.zip"
 }
 
@@ -314,7 +314,7 @@ resource "aws_lambda_function" "update_video_lambda" {
 
 data "archive_file" "update_video" {
   type        = "zip"
-  source_dir  = "./update-video-lambda"
+  source_dir  = "./lambda/update-video-lambda"
   output_path = "./lambdazip/update-video-lambda.zip"
 }
 

@@ -1,4 +1,6 @@
 swagger: '2.0'
+x-stoplight:
+  id: d6o40f00aca2a
 schemes:
   - https
 definitions:
@@ -12,13 +14,40 @@ info:
 produces:
   - application/json
 paths:
-  /videobackup-submit:
+  /video:
     get:
-      produces:
-        - application/json
+      summary: ''
+      operationId: get-video
       responses:
         '200':
-          description: 200 response
+          description: OK
+          schema:
+            $ref: '#/definitions/Empty'
+      description: 動画情報一覧を取得
+      parameters:
+        - type: string
+          in: query
+          name: upload_status
+          description: 取得する動画の状態をバックアップ済み(complete)、バックアップ中(initi)かで指定する(デフォルトcomplete)
+        - type: integer
+          in: query
+          name: fetch_num
+          description: 取得する動画件数(デフォルト30件)
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: '${video-list-lambda_arn}'
+        responses:
+          default:
+            statusCode: '200'
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+    post:
+      summary: ''
+      operationId: post-video
+      responses:
+        '200':
+          description: OK
           schema:
             $ref: '#/definitions/Empty'
           examples:
@@ -40,6 +69,15 @@ paths:
                 already_backup: true
                 batch_job_id: ''
                 s3: 's3://youtubedl-bucket/youtube/2022/2/7/SkNtkQGP7zQ.mp4'
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+      description: 動画をバックアップする
       x-amazon-apigateway-integration:
         type: aws_proxy
         httpMethod: POST
@@ -49,18 +87,12 @@ paths:
             statusCode: '200'
         passthroughBehavior: when_no_match
         contentHandling: CONVERT_TO_TEXT
-      parameters:
-        - type: string
-          in: query
-          name: url
-          description: バックアップする動画のurl
-          required: true
-      operationId: ''
-      description: 動画バックアップジョブを登録する
-  /video-info:
+    parameters: []
+  '/video/{video_id}':
     get:
-      produces:
-        - application/json
+      summary: ''
+      operationId: get-video-data
+      description: ある動画情報を取得
       responses:
         '200':
           description: 200 response
@@ -92,52 +124,13 @@ paths:
             statusCode: '200'
         passthroughBehavior: when_no_match
         contentHandling: CONVERT_TO_TEXT
-      parameters:
-        - type: string
-          in: query
-          name: video_id
-          description: バックアップ動画に振られる一意のIDはオリジナル動画のurlから決定される
-          required: true
-      description: 動画情報を取得する
-    post:
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: video_id
-          description: "video_id"
-          required: true
-        - in: body
-          name: title
-          description: "title"
-          required: true
-      description: 動画情報をアップデートする
+    delete:
+      summary: ''
+      operationId: delete-video
+      description: 動画データを削除
       responses:
         '200':
-          description: 200 response
-          schema:
-            $ref: '#/definitions/Empty'
-          examples:
-            succ:
-              result: succ
-            NotFound:
-              result: error
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        httpMethod: POST
-        uri: '${update-video-lambda_arn}'
-        responses:
-          default:
-            statusCode: '200'
-        passthroughBehavior: when_no_match
-        contentHandling: CONVERT_TO_TEXT
-  /video-delete:
-    get:
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: 200 response
+          description: OK
           schema:
             $ref: '#/definitions/Empty'
           examples:
@@ -174,41 +167,38 @@ paths:
             statusCode: '200'
         passthroughBehavior: when_no_match
         contentHandling: CONVERT_TO_TEXT
-      description: 動画を削除する
-      parameters:
-        - type: string
-          in: query
-          name: video_id
-          description: 削除する動画ID
-          required: true
-  /video-list:
-    get:
-      produces:
-        - application/json
+    patch:
+      summary: ''
+      operationId: patch-video
       responses:
         '200':
-          description: 200 response
+          description: OK
           schema:
             $ref: '#/definitions/Empty'
+          examples:
+            succ:
+              result: succ
+            NotFound:
+              result: error
+      description: 動画情報を更新する
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+          description: ''
       x-amazon-apigateway-integration:
         type: aws_proxy
         httpMethod: POST
-        uri: '${video-list-lambda_arn}'
+        uri: '${update-video-lambda_arn}'
         responses:
           default:
             statusCode: '200'
         passthroughBehavior: when_no_match
         contentHandling: CONVERT_TO_TEXT
-      parameters:
-        - type: string
-          in: query
-          name: upload_status
-          description: 取得する動画の状態をバックアップ済み(complete)、バックアップ中(initi)かで指定する(デフォルトcomplete)
-        - type: integer
-          in: query
-          name: fetch_num
-          description: 取得する動画件数(デフォルト30件)
-      description: 動画の一覧を取得する
   /presigned-s3url:
     get:
       produces:

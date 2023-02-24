@@ -363,6 +363,7 @@ resource "aws_s3_bucket" "youtubedl_bucket" {
   bucket = "youtubedl-bucket"
   acl    = "private"
 
+
   lifecycle_rule {
     enabled = true
     transition {

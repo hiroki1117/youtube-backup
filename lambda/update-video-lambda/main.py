@@ -5,14 +5,13 @@ import json
 DYNAMO_TABLE = boto3.resource("dynamodb").Table(os.environ["DYNAMO_TABLE_NAME"])
 
 def lambda_handler(event, context):
-    body = event["body"]
-    params = json.loads(body)
+    params = json.loads(event["body"])
     update_result = False
-    
-    if "video_id" in params and "title" in params:
+
+    if "video_id" in event['pathParameters'] and "title" in params:
         res =DYNAMO_TABLE.update_item(
             Key={
-                "video_id": params["video_id"]
+                "video_id": event['pathParameters']['video_id']
             },
             UpdateExpression="SET title = :title",
             ExpressionAttributeValues={
