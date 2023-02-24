@@ -5,7 +5,7 @@ on:
     branches:
       - "main"
     paths:
-      - "youtube-dl-script/*"
+      - "script/youtube-dl-script/*"
 
   workflow_dispatch:
 
