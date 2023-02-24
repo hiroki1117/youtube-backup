@@ -5,7 +5,7 @@ import json
 def lambda_handler(event, context):
 
     for _ in range(1):
-        if (event['queryStringParameters'] is None) or ("video_id" not in event['queryStringParameters']):
+        if (event['pathParameters'] is None) or ("video_id" not in event['pathParameters']):
             result = {
                 'result': 'error',
                 'description': 'video_idを指定してください',
@@ -13,7 +13,7 @@ def lambda_handler(event, context):
             }
             break
 
-        video_id = event['queryStringParameters']['video_id']
+        video_id = event['pathParameters']['video_id']
 
         # 動画情報の取得
         table = boto3.resource("dynamodb").Table(os.environ["DYNAMO_TABLE_NAME"])

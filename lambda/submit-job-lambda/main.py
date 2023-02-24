@@ -42,7 +42,9 @@ RESULT_SUCC = "succ"
 
 
 def lambda_handler(event, context):
-    url = event['queryStringParameters']['url']
+    params = json.loads(event["body"])
+    url = params["url"] if "url" in params else ""
+
     video_controller = VideoController()
     dynamo_client = DynamoClient()
 

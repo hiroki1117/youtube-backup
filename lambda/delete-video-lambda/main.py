@@ -5,7 +5,7 @@ import json
 from urllib.parse import urlparse
 
 def lambda_handler(event, context):
-    video_id = event['queryStringParameters']['video_id']
+    video_id = event['pathParameters']['video_id']
 
     #削除ロジック
     result = process(video_id)
