@@ -2,6 +2,7 @@ import os
 import re
 import json
 import boto3
+import urllib.parse
 import urllib.request
 from urllib.parse import quote
 from functools import reduce
@@ -71,7 +72,14 @@ def extract_youtubevideoid(text):
 
 # youtube backupリクエスト
 def youtube_backup_request(url, youtube_url):
-    req = urllib.request.Request(url + youtube_url)
+    data = {
+        'url': youtube_url
+    }
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    data = json.dumps(data).encode('utf-8')
+    req = urllib.request.Request(url, data, headers, method='POST')
     with urllib.request.urlopen(req) as res:
         o = json.load(res)
         print(o)
