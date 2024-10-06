@@ -1,8 +1,8 @@
-FROM python:3.8-slim-buster
+FROM python:3.12-slim-bookworm
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install yt-dlp==2024.09.27 \
-    && pip install awscli==1.22.23
+    && pip install awscli==1.32.0
 
 RUN apt-get update \
     && apt-get install -y ffmpeg
