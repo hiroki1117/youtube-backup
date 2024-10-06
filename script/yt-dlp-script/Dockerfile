@@ -1,7 +1,7 @@
 FROM python:3.8-slim-buster
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install yt-dlp==2023.07.06 \
+    && pip install yt-dlp==2024.09.27 \
     && pip install awscli==1.22.23
 
 RUN apt-get update \
