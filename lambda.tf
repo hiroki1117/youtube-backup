@@ -336,3 +336,32 @@ module "iam_assumable_role_for_updatevideo_lambda" {
     "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
   ]
 }
+
+#動画DLに失敗したレコードを一括でretryするlambda
+resource "aws_lambda_function" "retry_submit_job_lambda" {
+  filename         = data.archive_file.retry_submit_job.output_path
+  function_name    = "retry-submit-job-lambda"
+  role             = module.iam_assumable_role_for_submitjob_lambda.iam_role_arn
+  handler          = "main.lambda_handler"
+  source_code_hash = data.archive_file.retry_submit_job.output_base64sha256
+  timeout          = 500
+
+  runtime = "python3.8"
+
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME         = aws_dynamodb_table.youtube-backup-table.name
+      JOB_DEFINITION_NAME       = var.youtube_dl_job_fargate_definition_name
+      JOB_REVISION              = aws_batch_job_definition.youtube_dl_job_fargate_definition.revision
+      JOB_QUEUE_NAME            = var.youtube_dl_job_fargate_queue_name
+      YTDLP_JOB_DEFINITION_NAME = aws_batch_job_definition.ytdlp_job_fargate_definition.name
+      YTDLP_JOB_REVISION        = aws_batch_job_definition.ytdlp_job_fargate_definition.revision
+    }
+  }
+}
+
+data "archive_file" "retry_submit_job" {
+  type        = "zip"
+  source_dir  = "./lambda/retry-submit-job-lambda"
+  output_path = "./lambdazip/retry-submit-job-lambda.zip"
+}
