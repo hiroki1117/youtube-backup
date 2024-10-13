@@ -131,6 +131,7 @@ class BatchClient:
         self.job_definition = JOB_DEFINITION_NAME + ":" + JOB_REVISION
         self.jobname = "youtubedljob-from-lambda"
         self.ytdlp_job_definition = YTDLP_JOB_DEFINITION_NAME + ":" + YTDLP_JOB_REVISION
+        self.proxy_path = PROXY_PATH # 一時的な対応
 
     def submit_job(self, url, video_data):           
         container_overrides={
@@ -149,7 +150,7 @@ class BatchClient:
                 },
                 {
                     'name': 'PROXY_PATH',
-                    'value': PROXY_PATH
+                    'value': self.proxy_path
                 }
             ]
         }
