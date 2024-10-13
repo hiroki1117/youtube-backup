@@ -234,6 +234,7 @@ class YoutubeClient():
     def __init__(self):
         self.PLATFORM = 'youtube'
         self.NORMAL_YOUTUBE_BASE_URL = 'https://www.youtube.com/watch?v='
+        self.NORMAL_YOUTUBE_SHORT_BASE_URL = 'https://www.youtube.com/shorts/'
 
     def get_video_id_from_url(self, url):
         video_url = self._normalize_url(url)
@@ -263,13 +264,22 @@ class YoutubeClient():
             backup_filename=video_id if not video_id.startswith("-") else "ABCXYZ" + video_id
         )
     
+    # URLからvideo_idを取得
     def __parse_url(self, url):
+        if self._is_short(url):
+            return urlparse(url).path.split('/shorts/')[-1]
         return parse_qs(urlparse(url).query)['v'][0]
 
     # youtubeのリダイレクトurl対応
     def _normalize_url(self, url):
+        if self._is_short(url):
+            short_id = urlparse(url).path.split('/shorts/')[-1]
+            return self.NORMAL_YOUTUBE_SHORT_BASE_URL + short_id
         return url if "youtube" in url else self.NORMAL_YOUTUBE_BASE_URL + urlparse(url).path[1::]
-
+    
+    # youtube shortのurlかどうかを判定
+    def _is_short(self, url):
+        return "/shorts/" in url
 
 class TwitterClient():
     def __init__(self):
