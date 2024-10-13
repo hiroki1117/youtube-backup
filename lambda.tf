@@ -152,7 +152,7 @@ resource "aws_lambda_function" "scrapbox_backup_lambda" {
   role             = module.iam_assumable_role_for_scrapbox_backup_lambda.iam_role_arn
   handler          = "main.lambda_handler"
   source_code_hash = data.archive_file.scrapbox_backup.output_base64sha256
-  timeout          = 500
+  timeout          = 900
 
   runtime = "python3.8"
   environment {
@@ -344,7 +344,7 @@ resource "aws_lambda_function" "retry_submit_job_lambda" {
   role             = module.iam_assumable_role_for_submitjob_lambda.iam_role_arn
   handler          = "main.lambda_handler"
   source_code_hash = data.archive_file.retry_submit_job.output_base64sha256
-  timeout          = 500
+  timeout          = 900
 
   runtime = "python3.8"
 
