@@ -34,7 +34,7 @@ def lambda_handler(event, context):
     for item in response['Items']:
         url = item['video_url']
         s3fullpath = item['s3fullpath']
-        s3path = s3fullpath[:s3fullpath.rfind('/')]
+        s3path = s3fullpath[:s3fullpath.rfind('/')] + '/'
         backup_filename = s3fullpath[s3fullpath.rfind('/')+1:]
         print(f"URL: {url}")
         print(f"Filename: {backup_filename}")
