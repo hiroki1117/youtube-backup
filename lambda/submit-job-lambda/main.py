@@ -26,7 +26,8 @@ ssm_response = ssm.get_parameters(
         ('/youtube-backup/twitter-api-key'),
         ('/youtube-backup/twitter-api-secret'),
         ('/youtube-backup/twitter-access-token'),
-        ('/youtube-backup/twitter-access-token-secret')
+        ('/youtube-backup/twitter-access-token-secret'),
+        ('/youtube-backuup/proxy-path')
     ],
     WithDecryption=True
 )
@@ -36,6 +37,7 @@ TWITTER_API_KEY = reduce(f('/youtube-backup/twitter-api-key'), ssm_response['Par
 TWITTER_API_SECRET = reduce(f('/youtube-backup/twitter-api-secret'), ssm_response['Parameters'], "")
 TWITTER_ACCESS_TOKEN = reduce(f('/youtube-backup/twitter-access-token'), ssm_response['Parameters'], "")
 TWITTER_ACCESS_TOKEN_SECRET = reduce(f('/youtube-backup/twitter-access-token-secret'), ssm_response['Parameters'], "")
+PROXY_PATH = reduce(f('/youtube-backup/proxy-path'), ssm_response['Parameters'], "")
 
 RESULT_ERROR = "error"
 RESULT_SUCC = "succ"
@@ -144,6 +146,10 @@ class BatchClient:
                 {
                     'name': 'S3PATH',
                     'value': video_data.s3path
+                },
+                {
+                    'name': 'PROXY_PATH',
+                    'value': PROXY_PATH
                 }
             ]
         }
