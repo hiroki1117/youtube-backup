@@ -27,7 +27,7 @@ ssm_response = ssm.get_parameters(
         ('/youtube-backup/twitter-api-secret'),
         ('/youtube-backup/twitter-access-token'),
         ('/youtube-backup/twitter-access-token-secret'),
-        ('/youtube-backuup/proxy-path')
+        ('/youtube-backup/proxy-path')
     ],
     WithDecryption=True
 )
