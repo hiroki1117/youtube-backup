@@ -73,8 +73,16 @@ def extract_youtubevideoid(text):
 	if result is not None:
 	    return result.group()
 	
-	
 	result = re.search(r"https://youtube\.com/shorts/.{11}", text)
+	if result is not None:
+	    return result.group()
+	return None
+
+	result = re.search(r"https://www\.youtube\.com/live/.{11}", text)
+	if result is not None:
+	    return result.group()
+	
+	result = re.search(r"https://youtube\.com/live/.{11}", text)
 	if result is not None:
 	    return result.group()
 	return None
