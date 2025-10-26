@@ -12,11 +12,9 @@ YTDLP_JOB_DEFINITION_NAME = os.environ["YTDLP_JOB_DEFINITION_NAME"]
 YTDLP_JOB_REVISION = os.environ["YTDLP_JOB_REVISION"]
 ssm = boto3.client('ssm', region_name='ap-northeast-1')
 ssm_response = ssm.get_parameters(
-    Names = [
     Names=[
         ('/youtube-backup/proxy-path'),
         ('/youtube-backup/cookie-s3-path'),
-    ],
     ],
     WithDecryption=True
 )
