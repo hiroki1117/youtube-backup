@@ -18,16 +18,16 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v1
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: github-action-youtubebackup-session
           aws-region: ap-northeast-1
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.1.4
 
@@ -39,4 +39,3 @@ jobs:
           terraform init
           terraform validate
           terraform plan -var "custome_domain_name=${{ secrets.CUSTOM_DOMAIN_NAME }}" -var "hostzone=${{ secrets.HOSTZONE }}"
-
