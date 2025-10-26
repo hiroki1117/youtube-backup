@@ -13,12 +13,16 @@ YTDLP_JOB_REVISION = os.environ["YTDLP_JOB_REVISION"]
 ssm = boto3.client('ssm', region_name='ap-northeast-1')
 ssm_response = ssm.get_parameters(
     Names = [
-        ('/youtube-backup/proxy-path')
+    Names=[
+        ('/youtube-backup/proxy-path'),
+        ('/youtube-backup/cookie-s3-path'),
+    ],
     ],
     WithDecryption=True
 )
 f = lambda z: lambda x,y: y["Value"] if y["Name"]==z else x
 PROXY_PATH = reduce(f('/youtube-backup/proxy-path'), ssm_response['Parameters'], "")
+COOKIE_S3_PATH = reduce(f('/youtube-backup/cookie-s3-path'), ssm_response['Parameters'], "")
 
 def lambda_handler(event, context):
     # 動画DLに失敗している(upload_status=init)データを取得
@@ -62,6 +66,7 @@ class BatchClient:
         self.jobname = "youtubedljob-from-lambda"
         self.ytdlp_job_definition = YTDLP_JOB_DEFINITION_NAME + ":" + YTDLP_JOB_REVISION
         self.proxy_path = PROXY_PATH # 一時的な対応
+        self.cookie_s3_path = COOKIE_S3_PATH # 一時的な対応
 
     def submit_job(self, url, s3path, backup_filename):           
         container_overrides={
@@ -81,6 +86,10 @@ class BatchClient:
                 {
                     'name': 'PROXY_PATH',
                     'value': self.proxy_path
+                },
+                {
+                    'name': 'COOKIE_S3_PATH',
+                    'value': self.cookie_s3_path
                 }
             ]
         }

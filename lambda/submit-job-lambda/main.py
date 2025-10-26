@@ -27,7 +27,8 @@ ssm_response = ssm.get_parameters(
         ('/youtube-backup/twitter-api-secret'),
         ('/youtube-backup/twitter-access-token'),
         ('/youtube-backup/twitter-access-token-secret'),
-        ('/youtube-backup/proxy-path')
+        ('/youtube-backup/proxy-path'),
+        ('/youtube-backup/cookie-s3-path'),
     ],
     WithDecryption=True
 )
@@ -38,6 +39,7 @@ TWITTER_API_SECRET = reduce(f('/youtube-backup/twitter-api-secret'), ssm_respons
 TWITTER_ACCESS_TOKEN = reduce(f('/youtube-backup/twitter-access-token'), ssm_response['Parameters'], "")
 TWITTER_ACCESS_TOKEN_SECRET = reduce(f('/youtube-backup/twitter-access-token-secret'), ssm_response['Parameters'], "")
 PROXY_PATH = reduce(f('/youtube-backup/proxy-path'), ssm_response['Parameters'], "")
+COOKIE_S3_PATH = reduce(f('/youtube-backup/cookie-s3-path'), ssm_response['Parameters'], "")
 
 RESULT_ERROR = "error"
 RESULT_SUCC = "succ"
@@ -132,6 +134,7 @@ class BatchClient:
         self.jobname = "youtubedljob-from-lambda"
         self.ytdlp_job_definition = YTDLP_JOB_DEFINITION_NAME + ":" + YTDLP_JOB_REVISION
         self.proxy_path = PROXY_PATH # 一時的な対応
+        self.cookie_s3_path = COOKIE_S3_PATH # 一時的な対応
 
     def submit_job(self, url, video_data):           
         container_overrides={
@@ -151,6 +154,10 @@ class BatchClient:
                 {
                     'name': 'PROXY_PATH',
                     'value': self.proxy_path
+                },
+                {
+                    'name': 'COOKIE_S3_PATH',
+                    'value': self.cookie_s3_path
                 }
             ]
         }

@@ -5,6 +5,7 @@ echo $URL
 echo $FILENAME
 echo ${S3PATH}
 echo ${PROXY_PATH}
+echo ${COOKIE_S3_PATH}
 
 
 # mp4でダウンロードが失敗したらマージでダウンロードする
@@ -23,10 +24,18 @@ echo ${PROXY_PATH}
 #
 #######################################################################################
 
-
+#######################################################################################
 # ↑の問題のため一時的にproxyを使ってダウンロードする
+#
+# yt-dlp --proxy "${PROXY_PATH}" -o "$FILENAME.%(ext)s" "$URL"
+#
+#######################################################################################
 
-yt-dlp --proxy "${PROXY_PATH}" -o "$FILENAME.%(ext)s" "$URL"
+# データセンタープロキシを使ってもbot判定されるようになったためcookie指定
+
+aws s3 cp "${COOKIE_S3_PATH}" ./cookies.txt
+
+yt-dlp --cookies ./cookies.txt -o "$FILENAME.%(ext)s" "$URL"
 
 FULLFILENAME=`find $FILENAME.*`
 
