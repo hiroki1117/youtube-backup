@@ -17,37 +17,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-buildx-action@v3
         
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - uses: aws-actions/configure-aws-credentials@v1
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ap-northeast-1
       
-      - uses: docker/login-action@v1
+      - uses: docker/login-action@v3
         with:
           registry: ${{ secrets.ECR_REGISTRY }}
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.ECR_REGISTRY }}/${{ secrets.YTDLP_ECR_REPOSITORY }}
           tags: |
             type=sha
             type=raw,value=latest
 
-      - uses: docker/build-push-action@v2
+      - uses: docker/build-push-action@v6
         with:
           context: ./script/yt-dlp-script
           push: true
