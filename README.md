@@ -1,3 +1,7 @@
+> [!Warning]
+> このプロジェクトのメンテは終了しました
+> 以降Terraformの操作を行わないこと
+
 # Youtube Backup
 
 URLからS3に動画データをバックアップする
