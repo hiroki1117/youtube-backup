@@ -4,7 +4,6 @@ set -eux
 echo $URL
 echo $FILENAME
 echo ${S3PATH}
-echo ${PROXY_PATH}
 echo ${COOKIE_S3_PATH}
 
 
