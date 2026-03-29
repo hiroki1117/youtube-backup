@@ -1,7 +1,7 @@
 FROM python:3.12-slim-bookworm
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install "yt-dlp[default]==2026.3.13" \
+    && pip install "yt-dlp[default]==2026.3.17" \
     && pip install awscli==1.32.0
 
 RUN apt-get update \
